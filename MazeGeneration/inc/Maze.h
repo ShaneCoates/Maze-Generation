@@ -4,6 +4,9 @@
 #include "glm.hpp"
 #include <list>
 #include <vector>
+#include <map>
+//#include "RandomTraversal.h"
+class RandomTraversal;
 class Camera;
 struct GLFWwindow;
 struct MazePiece {
@@ -23,7 +26,9 @@ public:
 	void ResetMaze();
 	void Stop();
 
-	void RandomTraversal();
+	void Navigate();
+
+	void InstantRandomTraversal();
 	void DemonstrateRandomTraversal();
 
 	bool m_wireFrame;
@@ -31,6 +36,11 @@ public:
 protected:
 private:
 
+	double m_timer;
+
+	bool m_navigating;
+	std::map<MazePiece*, float> m_navigatingOpen;
+	float m_navigatingCount;
 	MazePiece* GetRandomNeighbor(MazePiece* _start);
 
 	MazePiece* North(glm::vec2 _pos);
@@ -41,9 +51,7 @@ private:
 
 	MazePiece* m_mazePieces[MAZE_SIZE][MAZE_SIZE];
 
-	bool m_demonstratingRandomTraversal;
-	//RandomTraversal stuff
-	std::list<MazePiece*> m_randomTraversalOpen;
+	RandomTraversal* m_randomTraversal;
 };
 
 #endif

@@ -47,6 +47,9 @@ void MazeState::DrawGUI() {
 			if (ImGui::Button("Reset")) {
 				m_maze->ResetMaze();
 			}
+			if (ImGui::Button("Navigate")) {
+				m_maze->Navigate();
+			}
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Random Traversal")) {
@@ -57,7 +60,7 @@ void MazeState::DrawGUI() {
 			ImGui::SameLine();
 			if (ImGui::Button("Instant")) {
 				m_maze->ResetMaze();
-				m_maze->RandomTraversal();
+				m_maze->InstantRandomTraversal();
 			}
 			ImGui::TreePop();
 		}

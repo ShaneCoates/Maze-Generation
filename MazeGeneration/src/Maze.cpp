@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-
+#include "RandomTraversal.h"
 Maze::Maze() {
 	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
 		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
@@ -16,18 +16,21 @@ Maze::Maze() {
 
 		}
 	}
-	m_demonstratingRandomTraversal = false;
 	m_wireFrame = false;
-
+	m_navigating = false;
+	m_navigatingCount = 0;
+	m_timer = 0.0f;
+	m_randomTraversal = new RandomTraversal(m_mazePieces);
 }
 Maze::~Maze() {
 
 }
 void Maze::Update(double _dt) {
-	if (m_demonstratingRandomTraversal) {
-		DemonstrateRandomTraversal();
+	if (m_navigating) {
+		Navigate();
 	}
-
+	m_randomTraversal->Update(_dt);
+	m_timer += _dt * 4;
 }
 
 void Maze::Draw(Camera* _camera) {
@@ -47,8 +50,27 @@ void Maze::Draw(Camera* _camera) {
 					Gizmos::addAABB(glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour);
 				}
 				else {
-					Gizmos::addAABBFilled(glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour);
+					Gizmos::addAABBFilled(glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour, pColour);
 				}
+			}
+		}
+	}
+	if (m_navigatingOpen.size() > 0) {
+		typedef std::map<MazePiece*, float>::iterator it_type;
+		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
+			glm::vec4 colour(1.0f);
+			if ((float)i->second < 1.0f) {
+				colour.r = (float)i->second;
+			}
+			if ((float)i->second < 2.0f) {
+				colour.g = (float)i->second - 1.0f;
+			}
+			//colour.a = ((sin(m_timer) + 1) * 0.25f) + 0.5f;
+			if (m_wireFrame) {
+				Gizmos::addAABB(glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour);
+			}
+			else {
+				Gizmos::addAABBFilled(glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour, colour);
 			}
 		}
 	}
@@ -57,26 +79,11 @@ void Maze::Draw(Camera* _camera) {
 MazePiece* Maze::GetRandomNeighbor(MazePiece* _start) {
 	std::vector<MazePiece*> m_neighborList;
 	glm::vec2 pos = _start->Position.xz;
-	if (pos.x > 1) {
-		if (m_mazePieces[(int)pos.x - 1][(int)pos.y]->Wall) {
-			m_neighborList.push_back((m_mazePieces[(int)pos.x - 1][(int)pos.y]));
-		}
-	}
-	if (pos.x < MAZE_SIZE - 2) {
-		if (m_mazePieces[(int)pos.x + 1][(int)pos.y]->Wall) {
-			m_neighborList.push_back((m_mazePieces[(int)pos.x + 1][(int)pos.y]));
-		}
-	}
-	if (pos.y > 1) {
-		if (m_mazePieces[(int)pos.x][(int)pos.y - 1]->Wall) {
-			m_neighborList.push_back((m_mazePieces[(int)pos.x][(int)pos.y - 1]));
-		}
-	}
-	if (pos.y < MAZE_SIZE - 2) {
-		if (m_mazePieces[(int)pos.x][(int)pos.y + 1]->Wall) {
-			m_neighborList.push_back((m_mazePieces[(int)pos.x][(int)pos.y + 1]));
-		}
-	}
+	if (North(pos)->Wall) m_neighborList.push_back(North(pos));
+	if (South(pos)->Wall) m_neighborList.push_back(South(pos));
+	if (East(pos)->Wall) m_neighborList.push_back(East(pos));
+	if (West(pos)->Wall) m_neighborList.push_back(West(pos));
+
 	int count = m_neighborList.size();
 	return m_neighborList[rand() % count];
 }
@@ -116,8 +123,6 @@ MazePiece* Maze::West(glm::vec2 _pos) {
 
 
 void Maze::Stop() {
-	m_demonstratingRandomTraversal = false;
-	m_randomTraversalOpen.clear();
 }
 
 void Maze::ResetMaze() {
@@ -129,201 +134,59 @@ void Maze::ResetMaze() {
 			m_mazePieces[x][z]->InOpenList = false;
 		}
 	}
+	m_navigatingCount = 0;
+	m_navigatingOpen.clear();
+	m_navigating = false;
 	Stop();
 }
 
-void Maze::RandomTraversal() {
-	std::list<MazePiece*> pOpen;
-	pOpen.push_back(m_mazePieces[1][1]);
-	m_mazePieces[1][1]->Traversed = true;
-	while (pOpen.size() > 0) {
-		std::vector<MazePiece*> m_tempVector{ std::begin(pOpen), std::end(pOpen) };
-		std::random_shuffle(m_tempVector.begin(), m_tempVector.end());
-		pOpen.clear();
-		std::copy(m_tempVector.begin(), m_tempVector.end(), std::back_inserter(pOpen));
-
-		pOpen.front()->Wall = false;
-		
-		glm::vec2 pos = pOpen.front()->Position.xz;
-		if (pos.x > 1) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x - 1][(int)pos.y];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x - 2][(int)pos.y]->Wall) {
-					if (!(std::find(pOpen.begin(), pOpen.end(), nextPiece) != pOpen.end())) {
-						pOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				pOpen.remove(nextPiece);
-			}
+void Maze::Navigate() {
+	if (m_navigating = false) {
+		m_navigatingCount = 0;
+		typedef std::map<MazePiece*, float>::iterator it_type;
+		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
+			i->first->InOpenList = false;
 		}
-		if (pos.x < MAZE_SIZE - 2) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x + 1][(int)pos.y];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x + 2][(int)pos.y]->Wall) {
-					if (!(std::find(pOpen.begin(), pOpen.end(), nextPiece) != pOpen.end())) {
-						pOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				pOpen.remove(nextPiece);
-			}
-		}
-		if (pos.y > 1) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x][(int)pos.y - 1];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x][(int)pos.y - 2]->Wall) {
-					if (!(std::find(pOpen.begin(), pOpen.end(), nextPiece) != pOpen.end())) {
-						pOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				pOpen.remove(nextPiece);
-			}
-		}
-		if (pos.y < MAZE_SIZE - 2) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x][(int)pos.y + 1];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x][(int)pos.y + 2]->Wall) {
-					if (!(std::find(pOpen.begin(), pOpen.end(), nextPiece) != pOpen.end())) {
-						pOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				pOpen.remove(nextPiece);
-			}
-		}
-		pOpen.front()->InOpenList = false;
-		pOpen.pop_front();
-		
-
+		m_navigatingOpen.clear();
 	}
-	m_mazePieces[0][1]->Wall = false;
-
-	m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 1]->Wall = false;
-	m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 2]->Wall = false;
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
-			m_mazePieces[x][z]->Traversed = false;
-			m_mazePieces[x][z]->InOpenList = false;
-
-		}
+	m_navigatingCount += .04f;
+	m_navigating = true;
+	if (m_navigatingOpen.size() == 0) {
+		m_navigatingOpen.insert(std::pair<MazePiece*, float>(m_mazePieces[1][1], m_navigatingCount));
 	}
+	else {
+		std::map<MazePiece*, float> tempMap;
+		typedef std::map<MazePiece*, float>::iterator it_type;
+		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
+			if (!North(i->first->Position.xz)->Wall &&
+				!North(i->first->Position.xz)->InOpenList) {
+				North(i->first->Position.xz)->InOpenList = true;
+				tempMap.insert(std::pair<MazePiece*, float>(North(i->first->Position.xz), m_navigatingCount));
+			}
+			if (!South(i->first->Position.xz)->Wall &&
+				!South(i->first->Position.xz)->InOpenList) {
+				South(i->first->Position.xz)->InOpenList = true;
+				tempMap.insert(std::pair<MazePiece*, float>(South(i->first->Position.xz), m_navigatingCount));
+			}
+			if (!East(i->first->Position.xz)->Wall &&
+				!East(i->first->Position.xz)->InOpenList) {
+				East(i->first->Position.xz)->InOpenList = true;
+				tempMap.insert(std::pair<MazePiece*, float>(East(i->first->Position.xz), m_navigatingCount));
+			}
+			if (!West(i->first->Position.xz)->Wall &&
+				!West(i->first->Position.xz)->InOpenList) {
+				West(i->first->Position.xz)->InOpenList = true;
+				tempMap.insert(std::pair<MazePiece*, float>(West(i->first->Position.xz), m_navigatingCount));
+			}
+		}
+		m_navigatingOpen.insert(tempMap.begin(), tempMap.end());
+	}
+}
 
+void Maze::InstantRandomTraversal() {
+	m_randomTraversal->Instant();
 }
 
 void Maze::DemonstrateRandomTraversal() {
-	if (!m_demonstratingRandomTraversal) {
-		m_randomTraversalOpen.push_back(m_mazePieces[1][1]);
-		m_mazePieces[1][1]->Traversed = true;
-		m_mazePieces[1][1]->InOpenList = true;
-
-		m_mazePieces[0][1]->Wall = false;
-	}
-	m_demonstratingRandomTraversal = true;
-	
-
-	
-	if (m_randomTraversalOpen.size() > 0) {
-		std::vector<MazePiece*> m_tempVector{ std::begin(m_randomTraversalOpen), std::end(m_randomTraversalOpen) };
-		std::random_shuffle(m_tempVector.begin(), m_tempVector.end());
-		m_randomTraversalOpen.clear();
-		std::copy(m_tempVector.begin(), m_tempVector.end(), std::back_inserter(m_randomTraversalOpen));
-
-		m_randomTraversalOpen.front()->Wall = false;
-		m_randomTraversalOpen.front()->InOpenList = true;
-
-		glm::vec2 pos = m_randomTraversalOpen.front()->Position.xz;
-		if (pos.x > 1) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x - 1][(int)pos.y];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x - 2][(int)pos.y]->Wall) {
-					if (!(std::find(m_randomTraversalOpen.begin(), m_randomTraversalOpen.end(), nextPiece) != m_randomTraversalOpen.end())) {
-						m_randomTraversalOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				m_randomTraversalOpen.remove(nextPiece);
-				nextPiece->InOpenList = false;
-			}
-		}
-		if (pos.x < MAZE_SIZE - 2) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x + 1][(int)pos.y];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x + 2][(int)pos.y]->Wall) {
-					if (!(std::find(m_randomTraversalOpen.begin(), m_randomTraversalOpen.end(), nextPiece) != m_randomTraversalOpen.end())) {
-						m_randomTraversalOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				m_randomTraversalOpen.remove(nextPiece);
-				nextPiece->InOpenList = false;
-			}
-		}
-		if (pos.y > 1) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x][(int)pos.y - 1];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x][(int)pos.y - 2]->Wall) {
-					if (!(std::find(m_randomTraversalOpen.begin(), m_randomTraversalOpen.end(), nextPiece) != m_randomTraversalOpen.end())) {
-						m_randomTraversalOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				m_randomTraversalOpen.remove(nextPiece);
-				nextPiece->InOpenList = false;
-			}
-		}
-		if (pos.y < MAZE_SIZE - 2) {
-			MazePiece* nextPiece = m_mazePieces[(int)pos.x][(int)pos.y + 1];
-			if (!nextPiece->Traversed) {
-				nextPiece->Traversed = true;
-				if (m_mazePieces[(int)pos.x][(int)pos.y + 2]->Wall) {
-					if (!(std::find(m_randomTraversalOpen.begin(), m_randomTraversalOpen.end(), nextPiece) != m_randomTraversalOpen.end())) {
-						m_randomTraversalOpen.push_back(nextPiece);
-						nextPiece->InOpenList = true;
-					}
-				}
-			}
-			else {
-				m_randomTraversalOpen.remove(nextPiece);
-				nextPiece->InOpenList = false;
-			}
-		}
-		m_randomTraversalOpen.front()->InOpenList = false;
-		m_randomTraversalOpen.pop_front();
-
-	}
-	else {
-		m_demonstratingRandomTraversal = false;
-		m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 1]->Wall = false;
-		m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 2]->Wall = false;
-		for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-			for (unsigned int z = 0; z < MAZE_SIZE; z++) {
-				m_mazePieces[x][z]->Traversed = false;
-				m_mazePieces[x][z]->InOpenList = false;
-
-			}
-		}
-	}
+	m_randomTraversal->StartDemonstration();
 }

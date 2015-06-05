@@ -96,6 +96,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Maze.cpp" />
     <ClCompile Include="src\MazeState.cpp" />
+    <ClCompile Include="src\RandomTraversal.cpp" />
     <ClCompile Include="src\ShaderLoader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\SplashState.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="inc\gl_core_4_4.h" />
     <ClInclude Include="inc\Maze.h" />
     <ClInclude Include="inc\MazeState.h" />
+    <ClInclude Include="inc\RandomTraversal.h" />
     <ClInclude Include="inc\ShaderLoader.h" />
     <ClInclude Include="inc\Skybox.h" />
     <ClInclude Include="inc\SplashState.h" />
