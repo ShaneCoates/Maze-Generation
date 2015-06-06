@@ -1,12 +1,12 @@
 #ifndef _MAZE_H_
 #define	_MAZE_H_
-#define MAZE_SIZE 25
+#define MAZE_SIZE 30
 #include "glm.hpp"
 #include <list>
 #include <vector>
 #include <map>
-//#include "RandomTraversal.h"
 class RandomTraversal;
+class RandomDepthFirst;
 class Camera;
 struct GLFWwindow;
 struct MazePiece {
@@ -14,6 +14,12 @@ struct MazePiece {
 	bool Wall;
 	bool Traversed;
 	bool InOpenList;
+	unsigned int cost;
+	bool operator<(const MazePiece& piece1) const { return cost < piece1.cost; }
+	bool operator>(const MazePiece& piece1) const { return cost > piece1.cost; }
+	bool operator==(const MazePiece& piece1) const { return cost == piece1.cost; }
+
+
 };
 class Maze {
 public:
@@ -30,6 +36,9 @@ public:
 
 	void InstantRandomTraversal();
 	void DemonstrateRandomTraversal();
+	void InstantRandomDepthFirst();
+	void DemonstrateRandomDepthFirst();
+
 
 	bool m_wireFrame;
 
@@ -52,6 +61,7 @@ private:
 	MazePiece* m_mazePieces[MAZE_SIZE][MAZE_SIZE];
 
 	RandomTraversal* m_randomTraversal;
+	RandomDepthFirst* m_randomDepthFirst;
 };
 
 #endif

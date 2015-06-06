@@ -64,5 +64,17 @@ void MazeState::DrawGUI() {
 			}
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Random Depth First")) {
+			if (ImGui::Button("Demonstrate")) {
+				m_maze->ResetMaze();
+				m_maze->DemonstrateRandomDepthFirst();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Instant")) {
+				m_maze->ResetMaze();
+				m_maze->InstantRandomDepthFirst();
+			}
+			ImGui::TreePop();
+		}
 	}
 }

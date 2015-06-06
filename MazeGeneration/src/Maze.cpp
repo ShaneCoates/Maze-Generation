@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iterator>
 #include "RandomTraversal.h"
+#include "RandomDepthFirst.h"
 Maze::Maze() {
 	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
 		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
@@ -21,6 +22,8 @@ Maze::Maze() {
 	m_navigatingCount = 0;
 	m_timer = 0.0f;
 	m_randomTraversal = new RandomTraversal(m_mazePieces);
+	m_randomDepthFirst = new RandomDepthFirst(m_mazePieces);
+	ResetMaze();
 }
 Maze::~Maze() {
 
@@ -30,6 +33,7 @@ void Maze::Update(double _dt) {
 		Navigate();
 	}
 	m_randomTraversal->Update(_dt);
+	m_randomDepthFirst->Update(_dt);
 	m_timer += _dt * 4;
 }
 
@@ -59,12 +63,12 @@ void Maze::Draw(Camera* _camera) {
 		typedef std::map<MazePiece*, float>::iterator it_type;
 		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
 			glm::vec4 colour(1.0f);
-			if ((float)i->second < 1.0f) {
-				colour.r = (float)i->second;
-			}
-			if ((float)i->second < 2.0f) {
-				colour.g = (float)i->second - 1.0f;
-			}
+			
+			colour.r = abs(sinf(i->second * 2));
+			colour.g = abs(cosf(i->second));
+			colour.b = abs(tanf(i->second * 4));
+
+
 			//colour.a = ((sin(m_timer) + 1) * 0.25f) + 0.5f;
 			if (m_wireFrame) {
 				Gizmos::addAABB(glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour);
@@ -123,6 +127,7 @@ MazePiece* Maze::West(glm::vec2 _pos) {
 
 
 void Maze::Stop() {
+
 }
 
 void Maze::ResetMaze() {
@@ -132,6 +137,7 @@ void Maze::ResetMaze() {
 			m_mazePieces[x][z]->Wall = true;
 			m_mazePieces[x][z]->Traversed = false;
 			m_mazePieces[x][z]->InOpenList = false;
+			m_mazePieces[x][z]->cost = 0;
 		}
 	}
 	m_navigatingCount = 0;
@@ -189,4 +195,10 @@ void Maze::InstantRandomTraversal() {
 
 void Maze::DemonstrateRandomTraversal() {
 	m_randomTraversal->StartDemonstration();
+}
+void Maze::InstantRandomDepthFirst() {
+	m_randomDepthFirst->Instant();
+}
+void Maze::DemonstrateRandomDepthFirst() {
+	m_randomDepthFirst->StartDemonstration();
 }
