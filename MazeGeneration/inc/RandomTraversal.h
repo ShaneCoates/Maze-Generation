@@ -5,7 +5,7 @@
 struct MazePiece;
 class RandomTraversal {
 public:
-	RandomTraversal(MazePiece* _mazePieces[MAZE_SIZE][MAZE_SIZE]);
+	RandomTraversal(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT]);
 	~RandomTraversal();
 
 	void Update(double _dt);
@@ -17,7 +17,7 @@ private:
 
 	void Demonstrate();
 
-	MazePiece* m_mazePieces[MAZE_SIZE][MAZE_SIZE];
+	MazePiece* m_mazePieces[MAZE_WIDTH][MAZE_HEIGHT];
 
 	bool m_demonstrating;
 	std::list<MazePiece*> m_open;

@@ -1,6 +1,7 @@
 #ifndef _MAZE_H_
 #define	_MAZE_H_
-#define MAZE_SIZE 30
+#define MAZE_WIDTH 100
+#define MAZE_HEIGHT 50
 #include "glm.hpp"
 #include <list>
 #include <vector>
@@ -61,7 +62,7 @@ private:
 	MazePiece* West(glm::vec2 _pos);
 
 
-	MazePiece* m_mazePieces[MAZE_SIZE][MAZE_SIZE];
+	MazePiece* m_mazePieces[MAZE_WIDTH][MAZE_HEIGHT];
 
 	RandomTraversal* m_randomTraversal;
 	RandomDepthFirst* m_randomDepthFirst;

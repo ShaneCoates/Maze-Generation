@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <iterator>
 
-Wilsons::Wilsons(MazePiece* _mazePieces[MAZE_SIZE][MAZE_SIZE]) {
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int y = 0; y < MAZE_SIZE; y++) {
+Wilsons::Wilsons(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT]) {
+	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+		for (unsigned int y = 0; y < MAZE_HEIGHT; y++) {
 			m_mazePieces[x][y] = _mazePieces[x][y];
 		}
 	}
@@ -25,8 +25,8 @@ void Wilsons::StartDemonstration() {
 		m_mazePieces[1][1]->Traversed = true;
 		m_mazePieces[1][1]->InOpenList = true;
 		m_mazePieces[0][1]->Wall = false;
-		m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 1]->Wall = false;
-		m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 2]->Wall = false;
+		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1]->Wall = false;
+		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 2]->Wall = false;
 		m_demonstrating = true;
 	}
 
@@ -44,8 +44,8 @@ void Wilsons::Demonstrate() {
 	}
 	else {
 		m_demonstrating = false;
-		for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-			for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+		for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+			for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 				m_mazePieces[x][z]->InOpenList = false;
 			}
 		}
@@ -87,7 +87,7 @@ MazePiece* Wilsons::GetRandomNeighbor(MazePiece* _start) {
 }
 
 MazePiece* Wilsons::North(glm::vec2 _pos) {
-	if (_pos.y < MAZE_SIZE - 1) {
+	if (_pos.y < MAZE_HEIGHT - 1) {
 		return m_mazePieces[(int)_pos.x][(int)_pos.y + 1];
 	}
 	else {
@@ -103,7 +103,7 @@ MazePiece* Wilsons::South(glm::vec2 _pos) {
 	}
 }
 MazePiece* Wilsons::East(glm::vec2 _pos) {
-	if (_pos.x < MAZE_SIZE - 1) {
+	if (_pos.x < MAZE_WIDTH - 1) {
 		return m_mazePieces[(int)_pos.x + 1][(int)_pos.y];
 	}
 	else {

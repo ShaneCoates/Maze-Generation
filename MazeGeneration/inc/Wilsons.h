@@ -5,7 +5,7 @@
 struct MazePiece;
 class Wilsons {
 public:
-	Wilsons(MazePiece* _mazePieces[MAZE_SIZE][MAZE_SIZE]);
+	Wilsons(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT]);
 	~Wilsons();
 
 	void Update(double _dt);
@@ -18,7 +18,7 @@ private:
 	void Demonstrate();
 	void Build();
 	void Cut(MazePiece* _start);
-	MazePiece* m_mazePieces[MAZE_SIZE][MAZE_SIZE];
+	MazePiece* m_mazePieces[MAZE_WIDTH][MAZE_HEIGHT];
 
 	bool m_demonstrating;
 	std::list<MazePiece*> m_open;
