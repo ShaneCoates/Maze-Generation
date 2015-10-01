@@ -101,6 +101,7 @@
     <ClCompile Include="src\ShaderLoader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\SplashState.cpp" />
+    <ClCompile Include="src\Wilsons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Camera.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="inc\stb_rect_pack.h" />
     <ClInclude Include="inc\stb_textedit.h" />
     <ClInclude Include="inc\stb_truetype.h" />
+    <ClInclude Include="inc\Wilsons.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -47,8 +47,8 @@ void MazeState::DrawGUI() {
 			if (ImGui::Button("Reset")) {
 				m_maze->ResetMaze();
 			}
-			if (ImGui::Button("Navigate")) {
-				m_maze->Navigate();
+			if (ImGui::Button("Flood")) {
+				m_maze->Flood();
 			}
 			ImGui::TreePop();
 		}
@@ -76,5 +76,18 @@ void MazeState::DrawGUI() {
 			}
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Wilsons")) {
+			if (ImGui::Button("Demonstrate")) {
+				m_maze->ResetMaze();
+				m_maze->DemonstrateWilsons();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Instant")) {
+				m_maze->ResetMaze();
+				m_maze->InstantWilsons();
+			}
+			ImGui::TreePop();
+		}
+
 	}
 }

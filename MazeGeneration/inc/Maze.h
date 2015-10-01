@@ -7,6 +7,7 @@
 #include <map>
 class RandomTraversal;
 class RandomDepthFirst;
+class Wilsons;
 class Camera;
 struct GLFWwindow;
 struct MazePiece {
@@ -32,12 +33,14 @@ public:
 	void ResetMaze();
 	void Stop();
 
-	void Navigate();
+	void Flood();
 
 	void InstantRandomTraversal();
 	void DemonstrateRandomTraversal();
 	void InstantRandomDepthFirst();
 	void DemonstrateRandomDepthFirst();
+	void InstantWilsons();
+	void DemonstrateWilsons();
 
 
 	bool m_wireFrame;
@@ -47,9 +50,9 @@ private:
 
 	double m_timer;
 
-	bool m_navigating;
-	std::map<MazePiece*, float> m_navigatingOpen;
-	float m_navigatingCount;
+	bool m_flooding;
+	std::map<MazePiece*, float> m_floodingOpen;
+	float m_floodingCount;
 	MazePiece* GetRandomNeighbor(MazePiece* _start);
 
 	MazePiece* North(glm::vec2 _pos);
@@ -62,6 +65,7 @@ private:
 
 	RandomTraversal* m_randomTraversal;
 	RandomDepthFirst* m_randomDepthFirst;
+	Wilsons* m_wilsons;
 };
 
 #endif

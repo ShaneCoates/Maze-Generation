@@ -6,6 +6,7 @@
 #include <iterator>
 #include "RandomTraversal.h"
 #include "RandomDepthFirst.h"
+#include "Wilsons.h"
 Maze::Maze() {
 	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
 		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
@@ -18,33 +19,35 @@ Maze::Maze() {
 		}
 	}
 	m_wireFrame = false;
-	m_navigating = false;
-	m_navigatingCount = 0;
+	m_flooding = false;
+	m_floodingCount = 0;
 	m_timer = 0.0f;
 	m_randomTraversal = new RandomTraversal(m_mazePieces);
 	m_randomDepthFirst = new RandomDepthFirst(m_mazePieces);
+	m_wilsons = new Wilsons(m_mazePieces);
 	ResetMaze();
 }
 Maze::~Maze() {
 
 }
 void Maze::Update(double _dt) {
-	if (m_navigating) {
-		Navigate();
+	if (m_flooding) {
+		Flood();
 	}
 	m_randomTraversal->Update(_dt);
 	m_randomDepthFirst->Update(_dt);
+	m_wilsons->Update(_dt);
 	m_timer += _dt * 4;
 }
 
 void Maze::Draw(Camera* _camera) {
-	Gizmos::addAABBFilled(glm::vec3((MAZE_SIZE * 0.05f) - 0.05f, -0.075f, (MAZE_SIZE * 0.05f) - 0.05f), glm::vec3((MAZE_SIZE * 0.05f) + 0.05f, 0.05f, (MAZE_SIZE * 0.05f) + 0.05f), glm::vec4(0, 0.2f, 0, 1));
+	Gizmos::addAABBFilled(glm::vec3((MAZE_SIZE * 0.05f) - 0.05f, -0.075f, (MAZE_SIZE * 0.05f) - 0.05f), glm::vec3((MAZE_SIZE * 0.05f) + 0.05f, 0.05f, (MAZE_SIZE * 0.05f) + 0.05f), glm::vec4(1, 1, 1, 1));
 	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
 		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
 			MazePiece* mp = m_mazePieces[x][z];
 			glm::vec4 pColour = glm::vec4(1);
 			if (mp->InOpenList) {
-				pColour = glm::vec4(1, 0, 1, 1);
+				pColour = glm::vec4(1, 0, 0, 1);
 			}
 			else {
 				pColour = glm::vec4(0, 0, 0, 1);
@@ -59,16 +62,21 @@ void Maze::Draw(Camera* _camera) {
 			}
 		}
 	}
-	if (m_navigatingOpen.size() > 0) {
+	if (m_floodingOpen.size() > 0) {
 		typedef std::map<MazePiece*, float>::iterator it_type;
-		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
+		for (it_type i = m_floodingOpen.begin(); i != m_floodingOpen.end(); i++) {
 			glm::vec4 colour(1.0f);
 			
-			colour.r = abs(sinf(i->second * 2));
-			colour.g = abs(cosf(i->second));
-			colour.b = abs(tanf(i->second * 4));
+			colour.r = sinf(i->second * 3 + 0) * 0.5f + 0.5f;
+			colour.g = sinf(i->second * 3 + 2) * 0.5f + 0.5f;
+			colour.b = sinf(i->second * 3 + 4) * 0.5f + 0.5f;
 
 
+			//colour.r = (sinf(i->second * 5) + 1) * 0.5f;
+			//colour.g = (cosf(i->second * 2) + 1) * 0.5f;
+			//colour.b = (sinf(i->second * 3) + 1) * 0.5f;
+			//colour = glm::normalize(colour);
+			colour.a = 1.0f;
 			//colour.a = ((sin(m_timer) + 1) * 0.25f) + 0.5f;
 			if (m_wireFrame) {
 				Gizmos::addAABB(glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour);
@@ -140,59 +148,71 @@ void Maze::ResetMaze() {
 			m_mazePieces[x][z]->cost = 0;
 		}
 	}
-	m_navigatingCount = 0;
-	m_navigatingOpen.clear();
-	m_navigating = false;
+	m_floodingCount = 0;
+	m_floodingOpen.clear();
+	m_flooding = false;
 	Stop();
 }
 
-void Maze::Navigate() {
-	if (m_navigating = false) {
-		m_navigatingCount = 0;
+void Maze::Flood() {
+	if (m_flooding == false) {
+		m_floodingCount = 0.01f;
 		typedef std::map<MazePiece*, float>::iterator it_type;
-		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
+		for (it_type i = m_floodingOpen.begin(); i != m_floodingOpen.end(); i++) {
 			i->first->InOpenList = false;
+			i->first->cost = 0.0f;
 		}
-		m_navigatingOpen.clear();
+		m_floodingOpen.clear();
 	}
-	m_navigatingCount += .04f;
-	m_navigating = true;
-	if (m_navigatingOpen.size() == 0) {
-		m_navigatingOpen.insert(std::pair<MazePiece*, float>(m_mazePieces[1][1], m_navigatingCount));
+	m_floodingCount += .01f;
+	m_flooding = true;
+	if (m_floodingOpen.size() == 0) {
+		m_floodingOpen.insert(std::pair<MazePiece*, float>(m_mazePieces[1][1], m_floodingCount));
 	}
 	else {
 		std::map<MazePiece*, float> tempMap;
 		typedef std::map<MazePiece*, float>::iterator it_type;
-		for (it_type i = m_navigatingOpen.begin(); i != m_navigatingOpen.end(); i++) {
+		for (it_type i = m_floodingOpen.begin(); i != m_floodingOpen.end(); i++) {
 			if (!North(i->first->Position.xz)->Wall &&
 				!North(i->first->Position.xz)->InOpenList) {
 				North(i->first->Position.xz)->InOpenList = true;
-				tempMap.insert(std::pair<MazePiece*, float>(North(i->first->Position.xz), m_navigatingCount));
+				tempMap.insert(std::pair<MazePiece*, float>(North(i->first->Position.xz), m_floodingCount));
 			}
 			if (!South(i->first->Position.xz)->Wall &&
 				!South(i->first->Position.xz)->InOpenList) {
 				South(i->first->Position.xz)->InOpenList = true;
-				tempMap.insert(std::pair<MazePiece*, float>(South(i->first->Position.xz), m_navigatingCount));
+				tempMap.insert(std::pair<MazePiece*, float>(South(i->first->Position.xz), m_floodingCount));
 			}
 			if (!East(i->first->Position.xz)->Wall &&
 				!East(i->first->Position.xz)->InOpenList) {
 				East(i->first->Position.xz)->InOpenList = true;
-				tempMap.insert(std::pair<MazePiece*, float>(East(i->first->Position.xz), m_navigatingCount));
+				tempMap.insert(std::pair<MazePiece*, float>(East(i->first->Position.xz), m_floodingCount));
 			}
 			if (!West(i->first->Position.xz)->Wall &&
 				!West(i->first->Position.xz)->InOpenList) {
 				West(i->first->Position.xz)->InOpenList = true;
-				tempMap.insert(std::pair<MazePiece*, float>(West(i->first->Position.xz), m_navigatingCount));
+				tempMap.insert(std::pair<MazePiece*, float>(West(i->first->Position.xz), m_floodingCount));
 			}
 		}
-		m_navigatingOpen.insert(tempMap.begin(), tempMap.end());
+		m_floodingOpen.insert(tempMap.begin(), tempMap.end());
+	}
+	if (m_floodingOpen.size() > MAZE_SIZE) {
+		unsigned int count = 0;
+		for (unsigned int x = 0; x < MAZE_SIZE; x++) {
+			for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+				if (!m_mazePieces[x][z]->Wall) {
+					++count;
+				}
+			}
+		}
+		if (m_floodingOpen.size() >= count) {
+			m_flooding = false;
+		}
 	}
 }
-
 void Maze::InstantRandomTraversal() {
 	m_randomTraversal->Instant();
 }
-
 void Maze::DemonstrateRandomTraversal() {
 	m_randomTraversal->StartDemonstration();
 }
@@ -201,4 +221,10 @@ void Maze::InstantRandomDepthFirst() {
 }
 void Maze::DemonstrateRandomDepthFirst() {
 	m_randomDepthFirst->StartDemonstration();
+}
+void Maze::InstantWilsons() {
+	m_wilsons->Instant();
+}
+void Maze::DemonstrateWilsons() {
+	m_wilsons->StartDemonstration();
 }
