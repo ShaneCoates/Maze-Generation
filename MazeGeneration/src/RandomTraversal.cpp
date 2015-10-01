@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <iterator>
 
-RandomTraversal::RandomTraversal(MazePiece* _mazePieces[MAZE_SIZE][MAZE_SIZE]) {
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int y = 0; y < MAZE_SIZE; y++) {
+RandomTraversal::RandomTraversal(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT]) {
+	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+		for (unsigned int y = 0; y < MAZE_HEIGHT; y++) {
 			m_mazePieces[x][y] = _mazePieces[x][y];
 		}
 	}
@@ -55,7 +55,7 @@ void RandomTraversal::Demonstrate() {
 				nextPiece->InOpenList = false;
 			}
 		}
-		if (pos.x < MAZE_SIZE - 2) {
+		if (pos.x < MAZE_WIDTH - 2) {
 			MazePiece* nextPiece = m_mazePieces[(int)pos.x + 1][(int)pos.y];
 			if (!nextPiece->Traversed) {
 				nextPiece->Traversed = true;
@@ -87,7 +87,7 @@ void RandomTraversal::Demonstrate() {
 				nextPiece->InOpenList = false;
 			}
 		}
-		if (pos.y < MAZE_SIZE - 2) {
+		if (pos.y < MAZE_HEIGHT - 2) {
 			MazePiece* nextPiece = m_mazePieces[(int)pos.x][(int)pos.y + 1];
 			if (!nextPiece->Traversed) {
 				nextPiece->Traversed = true;
@@ -109,10 +109,10 @@ void RandomTraversal::Demonstrate() {
 	}
 	else {
 		m_demonstrating = false;
-		m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 1]->Wall = false;
-		m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 2]->Wall = false;
-		for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-			for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1]->Wall = false;
+		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 2]->Wall = false;
+		for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+			for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 				m_mazePieces[x][z]->Traversed = false;
 				m_mazePieces[x][z]->InOpenList = false;
 
@@ -147,7 +147,7 @@ void RandomTraversal::Instant() {
 				m_open.remove(nextPiece);
 			}
 		}
-		if (pos.x < MAZE_SIZE - 2) {
+		if (pos.x < MAZE_WIDTH - 2) {
 			MazePiece* nextPiece = m_mazePieces[(int)pos.x + 1][(int)pos.y];
 			if (!nextPiece->Traversed) {
 				nextPiece->Traversed = true;
@@ -177,7 +177,7 @@ void RandomTraversal::Instant() {
 				m_open.remove(nextPiece);
 			}
 		}
-		if (pos.y < MAZE_SIZE - 2) {
+		if (pos.y < MAZE_HEIGHT - 2) {
 			MazePiece* nextPiece = m_mazePieces[(int)pos.x][(int)pos.y + 1];
 			if (!nextPiece->Traversed) {
 				nextPiece->Traversed = true;
@@ -199,10 +199,10 @@ void RandomTraversal::Instant() {
 	}
 	m_mazePieces[0][1]->Wall = false;
 
-	m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 1]->Wall = false;
-	m_mazePieces[MAZE_SIZE - 2][MAZE_SIZE - 2]->Wall = false;
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+	m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1]->Wall = false;
+	m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 2]->Wall = false;
+	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 			m_mazePieces[x][z]->Traversed = false;
 			m_mazePieces[x][z]->InOpenList = false;
 

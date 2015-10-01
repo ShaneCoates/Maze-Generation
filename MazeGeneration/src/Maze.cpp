@@ -7,8 +7,8 @@
 #include "RandomTraversal.h"
 #include "RandomDepthFirst.h"
 Maze::Maze() {
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 			m_mazePieces[x][z] = new MazePiece();
 			m_mazePieces[x][z]->Position = glm::vec3(x, 0, z);
 			m_mazePieces[x][z]->Wall = true;
@@ -38,9 +38,9 @@ void Maze::Update(double _dt) {
 }
 
 void Maze::Draw(Camera* _camera) {
-	Gizmos::addAABBFilled(glm::vec3((MAZE_SIZE * 0.05f) - 0.05f, -0.075f, (MAZE_SIZE * 0.05f) - 0.05f), glm::vec3((MAZE_SIZE * 0.05f) + 0.05f, 0.05f, (MAZE_SIZE * 0.05f) + 0.05f), glm::vec4(0, 0.2f, 0, 1));
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+	Gizmos::addAABBFilled(glm::vec3((MAZE_WIDTH * 0.05f) - 0.05f, -0.075f, (MAZE_HEIGHT * 0.05f) - 0.05f), glm::vec3((MAZE_WIDTH * 0.05f) + 0.05f, 0.05f, (MAZE_HEIGHT * 0.05f) + 0.05f), glm::vec4(0, 0.2f, 0, 1));
+	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 			MazePiece* mp = m_mazePieces[x][z];
 			glm::vec4 pColour = glm::vec4(1);
 			if (mp->InOpenList) {
@@ -93,7 +93,7 @@ MazePiece* Maze::GetRandomNeighbor(MazePiece* _start) {
 }
 
 MazePiece* Maze::North(glm::vec2 _pos) {
-	if (_pos.y < MAZE_SIZE - 1) {
+	if (_pos.y < MAZE_HEIGHT - 1) {
 		return m_mazePieces[(int)_pos.x][(int)_pos.y + 1];
 	}
 	else {
@@ -109,7 +109,7 @@ MazePiece* Maze::South(glm::vec2 _pos) {
 	}
 }
 MazePiece* Maze::East(glm::vec2 _pos) {
-	if (_pos.x < MAZE_SIZE - 1) {
+	if (_pos.x < MAZE_WIDTH - 1) {
 		return m_mazePieces[(int)_pos.x + 1][(int)_pos.y];
 	}
 	else {
@@ -131,8 +131,8 @@ void Maze::Stop() {
 }
 
 void Maze::ResetMaze() {
-	for (unsigned int x = 0; x < MAZE_SIZE; x++) {
-		for (unsigned int z = 0; z < MAZE_SIZE; z++) {
+	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
+		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 			m_mazePieces[x][z]->Position = glm::vec3(x, 0, z);
 			m_mazePieces[x][z]->Wall = true;
 			m_mazePieces[x][z]->Traversed = false;
