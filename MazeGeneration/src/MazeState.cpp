@@ -81,10 +81,8 @@ void MazeState::DrawGUI() {
 			}
 			ImGui::TreePop();
 		}
-		if (ImGui::Button("AStar"))
-		{
-			m_maze->InstantAStar();
-		}
+	}
+		
 		/*
 		if (ImGui::TreeNode("Wilsons")) {
 			if (ImGui::Button("Demonstrate")) {
@@ -99,6 +97,11 @@ void MazeState::DrawGUI() {
 			ImGui::TreePop();
 		}
 		*/
+	if (ImGui::CollapsingHeader("Pathfinding")) {
 
+		if (ImGui::Button("AStar"))
+		{
+			m_maze->InstantAStar();
+		}
 	}
 }
