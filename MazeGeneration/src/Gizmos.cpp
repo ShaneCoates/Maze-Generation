@@ -11,9 +11,9 @@ Gizmos::Gizmos(unsigned int a_maxLines, unsigned int a_maxTris,
 	m_lines(new GizmoLine[a_maxLines]),
 	m_maxTris(a_maxTris),
 	m_triCount(0),
-	m_tris(new GizmoTri[a_maxTris * 10]),
+	m_tris(new GizmoTri[a_maxTris]),
 	m_transparentTriCount(0),
-	m_transparentTris(new GizmoTri[a_maxTris * 10]),
+	m_transparentTris(new GizmoTri[a_maxTris]),
 	m_max2DLines(a_max2DLines),
 	m_2DlineCount(0),
 	m_2Dlines(new GizmoLine[a_max2DLines]),
@@ -76,11 +76,11 @@ Gizmos::Gizmos(unsigned int a_maxLines, unsigned int a_maxTris,
 
 	glGenBuffers( 1, &m_triVBO );
 	glBindBuffer(GL_ARRAY_BUFFER, m_triVBO);
-	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri) * 10, m_tris, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri), m_tris, GL_DYNAMIC_DRAW);
 
 	glGenBuffers( 1, &m_transparentTriVBO );
 	glBindBuffer(GL_ARRAY_BUFFER, m_transparentTriVBO);
-	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri) * 10, m_transparentTris, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri), m_transparentTris, GL_DYNAMIC_DRAW);
 
 	glGenBuffers( 1, &m_2DlineVBO );
 	glBindBuffer(GL_ARRAY_BUFFER, m_2DlineVBO);
@@ -158,7 +158,7 @@ void Gizmos::create(unsigned int a_maxLines /* = 0xffff */, unsigned int a_maxTr
 					unsigned int a_max2DLines /* = 0xff */, unsigned int a_max2DTris /* = 0xff */)
 {
 	if (sm_singleton == nullptr)
-		sm_singleton = new Gizmos(a_maxLines, a_maxTris * 10, a_max2DLines, a_max2DTris);
+		sm_singleton = new Gizmos(a_maxLines, a_maxTris, a_max2DLines, a_max2DTris);
 }
 
 void Gizmos::destroy()
