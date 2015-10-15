@@ -17,7 +17,8 @@ RandomTraversal::~RandomTraversal() {
 }
 void RandomTraversal::Update(double _dt) {
 	if (m_demonstrating) {
-		Demonstrate();
+		for (int i = 0; i < ITERATIONS; i++)
+			Demonstrate();
 	}
 }
 void RandomTraversal::StartDemonstration() {
@@ -127,4 +128,8 @@ void RandomTraversal::Instant() {
 	while (m_demonstrating) {
 		Demonstrate();
 	}
+}
+void RandomTraversal::Stop() {
+	m_demonstrating = false;
+	m_open.clear();
 }

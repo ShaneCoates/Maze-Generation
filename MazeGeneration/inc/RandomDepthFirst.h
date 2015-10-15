@@ -12,6 +12,9 @@ public:
 
 	void StartDemonstration();
 	void Instant();
+
+	void Stop();
+
 protected:
 private:
 

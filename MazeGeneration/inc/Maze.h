@@ -1,7 +1,8 @@
 #ifndef _MAZE_H_
 #define	_MAZE_H_
-#define MAZE_WIDTH 100
+#define MAZE_WIDTH 50
 #define MAZE_HEIGHT 50
+#define ITERATIONS 5
 #include "glm.hpp"
 #include <list>
 #include <vector>
@@ -21,7 +22,10 @@ struct MazePiece {
 	bool operator>(const MazePiece& piece1) const { return cost > piece1.cost; }
 	bool operator==(const MazePiece& piece1) const { return cost == piece1.cost; }
 
-
+	//A Star
+	MazePiece* Parent = nullptr;
+	bool AStarOpen = false;
+	bool AStarPath = false;
 };
 class Maze {
 public:
@@ -42,9 +46,10 @@ public:
 	void DemonstrateRandomDepthFirst();
 	void InstantWilsons();
 	void DemonstrateWilsons();
-
-
+	void InstantAStar();
 	bool m_wireFrame;
+
+	glm::vec3 m_position;
 
 protected:
 private:

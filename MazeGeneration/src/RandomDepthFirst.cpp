@@ -17,7 +17,8 @@ RandomDepthFirst::~RandomDepthFirst() {
 }
 void RandomDepthFirst::Update(double _dt) {
 	if (m_demonstrating) {
-		Demonstrate();
+		for (int i = 0; i < ITERATIONS; i++)
+			Demonstrate();
 	}
 }
 void RandomDepthFirst::StartDemonstration() {
@@ -211,4 +212,9 @@ MazePiece* RandomDepthFirst::West(glm::vec2 _pos) {
 	else {
 		return m_mazePieces[(int)_pos.x][(int)_pos.y];
 	}
+}
+
+void RandomDepthFirst::Stop() {
+	m_demonstrating = false;
+	m_open.clear();
 }

@@ -11,9 +11,9 @@ Gizmos::Gizmos(unsigned int a_maxLines, unsigned int a_maxTris,
 	m_lines(new GizmoLine[a_maxLines]),
 	m_maxTris(a_maxTris),
 	m_triCount(0),
-	m_tris(new GizmoTri[a_maxTris]),
+	m_tris(new GizmoTri[a_maxTris * 10]),
 	m_transparentTriCount(0),
-	m_transparentTris(new GizmoTri[a_maxTris]),
+	m_transparentTris(new GizmoTri[a_maxTris * 10]),
 	m_max2DLines(a_max2DLines),
 	m_2DlineCount(0),
 	m_2Dlines(new GizmoLine[a_max2DLines]),
@@ -76,11 +76,11 @@ Gizmos::Gizmos(unsigned int a_maxLines, unsigned int a_maxTris,
 
 	glGenBuffers( 1, &m_triVBO );
 	glBindBuffer(GL_ARRAY_BUFFER, m_triVBO);
-	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri), m_tris, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri) * 10, m_tris, GL_DYNAMIC_DRAW);
 
 	glGenBuffers( 1, &m_transparentTriVBO );
 	glBindBuffer(GL_ARRAY_BUFFER, m_transparentTriVBO);
-	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri), m_transparentTris, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_maxTris * sizeof(GizmoTri) * 10, m_transparentTris, GL_DYNAMIC_DRAW);
 
 	glGenBuffers( 1, &m_2DlineVBO );
 	glBindBuffer(GL_ARRAY_BUFFER, m_2DlineVBO);
@@ -158,7 +158,7 @@ void Gizmos::create(unsigned int a_maxLines /* = 0xffff */, unsigned int a_maxTr
 					unsigned int a_max2DLines /* = 0xff */, unsigned int a_max2DTris /* = 0xff */)
 {
 	if (sm_singleton == nullptr)
-		sm_singleton = new Gizmos(a_maxLines,a_maxTris,a_max2DLines,a_max2DTris);
+		sm_singleton = new Gizmos(a_maxLines, a_maxTris * 10, a_max2DLines, a_max2DTris);
 }
 
 void Gizmos::destroy()
@@ -246,9 +246,9 @@ void Gizmos::addAABB(const glm::vec3& a_center,
 	addLine(vVerts[3], vVerts[7], a_colour, a_colour);
 }
 
-void Gizmos::addAABBFilled(const glm::vec3& a_center, 
-	const glm::vec3& a_rvExtents, 
-	const glm::vec4& a_fillColour, 
+void Gizmos::addAABBFilled(const glm::vec3& a_center,
+	const glm::vec3& a_rvExtents,
+	const glm::vec4& a_fillColour,
 	const glm::vec4& a_lineColour,
 	const glm::mat4* a_transform /* = nullptr */)
 {
@@ -259,11 +259,11 @@ void Gizmos::addAABBFilled(const glm::vec3& a_center,
 
 	if (a_transform != nullptr)
 	{
-		auto temp = (*a_transform * glm::vec4(vX,0));
+		auto temp = (*a_transform * glm::vec4(vX, 0));
 		vX = glm::vec3(temp.x, temp.y, temp.z);
-		temp = (*a_transform * glm::vec4(vY,0));
+		temp = (*a_transform * glm::vec4(vY, 0));
 		vY = glm::vec3(temp.x, temp.y, temp.z);
-		temp = (*a_transform * glm::vec4(vZ,0));
+		temp = (*a_transform * glm::vec4(vZ, 0));
 		vZ = glm::vec3(temp.x, temp.y, temp.z);
 	}
 
@@ -279,21 +279,23 @@ void Gizmos::addAABBFilled(const glm::vec3& a_center,
 	vVerts[6] = a_center + vX + vZ + vY;
 	vVerts[7] = a_center + vX - vZ + vY;
 
-	addLine(vVerts[0], vVerts[1], a_lineColour, a_lineColour);
-	addLine(vVerts[1], vVerts[2], a_lineColour, a_lineColour);
-	addLine(vVerts[2], vVerts[3], a_lineColour, a_lineColour);
-	addLine(vVerts[3], vVerts[0], a_lineColour, a_lineColour);
+	if (a_lineColour != a_fillColour)
+	{
+		addLine(vVerts[0], vVerts[1], a_lineColour, a_lineColour);
+		addLine(vVerts[1], vVerts[2], a_lineColour, a_lineColour);
+		addLine(vVerts[2], vVerts[3], a_lineColour, a_lineColour);
+		addLine(vVerts[3], vVerts[0], a_lineColour, a_lineColour);
 
-	addLine(vVerts[4], vVerts[5], a_lineColour, a_lineColour);
-	addLine(vVerts[5], vVerts[6], a_lineColour, a_lineColour);
-	addLine(vVerts[6], vVerts[7], a_lineColour, a_lineColour);
-	addLine(vVerts[7], vVerts[4], a_lineColour, a_lineColour);
+		addLine(vVerts[4], vVerts[5], a_lineColour, a_lineColour);
+		addLine(vVerts[5], vVerts[6], a_lineColour, a_lineColour);
+		addLine(vVerts[6], vVerts[7], a_lineColour, a_lineColour);
+		addLine(vVerts[7], vVerts[4], a_lineColour, a_lineColour);
 
-	addLine(vVerts[0], vVerts[4], a_lineColour, a_lineColour);
-	addLine(vVerts[1], vVerts[5], a_lineColour, a_lineColour);
-	addLine(vVerts[2], vVerts[6], a_lineColour, a_lineColour);
-	addLine(vVerts[3], vVerts[7], a_lineColour, a_lineColour);
-
+		addLine(vVerts[0], vVerts[4], a_lineColour, a_lineColour);
+		addLine(vVerts[1], vVerts[5], a_lineColour, a_lineColour);
+		addLine(vVerts[2], vVerts[6], a_lineColour, a_lineColour);
+		addLine(vVerts[3], vVerts[7], a_lineColour, a_lineColour);
+	}
 	// top
 	addTri(vVerts[2], vVerts[1], vVerts[0], a_fillColour);
 	addTri(vVerts[3], vVerts[2], vVerts[0], a_fillColour);

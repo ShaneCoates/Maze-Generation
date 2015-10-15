@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AStar.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\FlyCamera.cpp" />
     <ClCompile Include="src\Game.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="src\Wilsons.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\AStar.h" />
     <ClInclude Include="inc\Camera.h" />
     <ClInclude Include="inc\FlyCamera.h" />
     <ClInclude Include="inc\Game.h" />

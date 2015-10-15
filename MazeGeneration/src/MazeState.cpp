@@ -3,13 +3,14 @@
 #include "imgui.h"
 #include "aieutilities\Gizmos.h"
 #include "Maze.h"
+#include "GLFW\glfw3.h"
 void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	m_window = _window;
 	m_gameStateManager = _gameStateManager;
 	m_camera = new FlyCamera(5.0f);
 	m_camera->SetInputWindow(m_window);
 	m_camera->SetPerspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
-	m_camera->SetLookAt(glm::vec3(8, 5, 8), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	m_camera->SetLookAt(glm::vec3(MAZE_WIDTH * 0.05f, 10, MAZE_HEIGHT * 0.05f), glm::vec3(MAZE_WIDTH * 0.05f, 0, MAZE_HEIGHT * 0.05f), glm::vec3(0, 0, 1));
 
 	m_maze = new Maze();
 
@@ -24,6 +25,10 @@ MazeState::~MazeState() {
 void MazeState::Update(double _dt) {
 	m_camera->Update(_dt);
 	m_maze->Update(_dt);
+	if (glfwGetKey(m_window, GLFW_KEY_I))
+	{
+		m_maze->m_position.x += _dt;
+	}
 }
 void MazeState::Draw() {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -76,6 +81,11 @@ void MazeState::DrawGUI() {
 			}
 			ImGui::TreePop();
 		}
+		if (ImGui::Button("AStar"))
+		{
+			m_maze->InstantAStar();
+		}
+		/*
 		if (ImGui::TreeNode("Wilsons")) {
 			if (ImGui::Button("Demonstrate")) {
 				m_maze->ResetMaze();
@@ -88,6 +98,7 @@ void MazeState::DrawGUI() {
 			}
 			ImGui::TreePop();
 		}
+		*/
 
 	}
 }

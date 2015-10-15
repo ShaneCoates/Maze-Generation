@@ -7,6 +7,7 @@
 #include "RandomTraversal.h"
 #include "RandomDepthFirst.h"
 #include "Wilsons.h"
+#include "AStar.h"
 Maze::Maze() {
 	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
 		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
@@ -25,6 +26,7 @@ Maze::Maze() {
 	m_randomTraversal = new RandomTraversal(m_mazePieces);
 	m_randomDepthFirst = new RandomDepthFirst(m_mazePieces);
 	m_wilsons = new Wilsons(m_mazePieces);
+	m_position = glm::vec3(0);
 	ResetMaze();
 }
 Maze::~Maze() {
@@ -32,16 +34,21 @@ Maze::~Maze() {
 }
 void Maze::Update(double _dt) {
 	if (m_flooding) {
-		Flood();
+		for (int i = 0; i < ITERATIONS; i++)
+		{
+			if (m_flooding)
+				Flood();
+		}
 	}
 	m_randomTraversal->Update(_dt);
 	m_randomDepthFirst->Update(_dt);
 	m_wilsons->Update(_dt);
 	m_timer += _dt * 4;
+	
 }
 
 void Maze::Draw(Camera* _camera) {
-	Gizmos::addAABBFilled(glm::vec3((MAZE_WIDTH * 0.05f) - 0.05f, -0.075f, (MAZE_HEIGHT * 0.05f) - 0.05f), glm::vec3((MAZE_WIDTH * 0.05f) + 0.05f, 0.05f, (MAZE_HEIGHT * 0.05f) + 0.05f), glm::vec4(0, 0.2f, 0, 1));
+	Gizmos::addAABBFilled(m_position + glm::vec3((MAZE_WIDTH * 0.05f) - 0.05f, -0.075f, (MAZE_HEIGHT * 0.05f) - 0.05f), glm::vec3((MAZE_WIDTH * 0.05f) + 0.05f, 0.05f, (MAZE_HEIGHT * 0.05f) + 0.05f), glm::vec4(1, 1, 1, 1));
 	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
 		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 			MazePiece* mp = m_mazePieces[x][z];
@@ -54,10 +61,10 @@ void Maze::Draw(Camera* _camera) {
 			}
 			if (mp->Wall) {
 				if (m_wireFrame) {
-					Gizmos::addAABB(glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour);
+					Gizmos::addAABB(m_position + glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour);
 				}
 				else {
-					Gizmos::addAABBFilled(glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour, pColour);
+					Gizmos::addAABBFilled(m_position + glm::vec3(mp->Position.x * 0.1f, 0, mp->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), pColour, pColour);
 				}
 			}
 		}
@@ -135,10 +142,13 @@ MazePiece* Maze::West(glm::vec2 _pos) {
 
 
 void Maze::Stop() {
-
+	m_randomTraversal->Stop();
+	m_randomDepthFirst->Stop();
 }
 
 void Maze::ResetMaze() {
+	Stop();
+
 	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
 		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
 			m_mazePieces[x][z]->Position = glm::vec3(x, 0, z);
@@ -151,7 +161,6 @@ void Maze::ResetMaze() {
 	m_floodingCount = 0;
 	m_floodingOpen.clear();
 	m_flooding = false;
-	Stop();
 }
 
 void Maze::Flood() {
@@ -227,4 +236,8 @@ void Maze::InstantWilsons() {
 }
 void Maze::DemonstrateWilsons() {
 	m_wilsons->StartDemonstration();
+}
+void Maze::InstantAStar()
+{
+	AStar::Instant(m_mazePieces, m_mazePieces[0][1], m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1], m_floodingOpen);
 }

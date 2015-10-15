@@ -59,30 +59,21 @@ void Wilsons::Instant() {
 MazePiece* Wilsons::GetRandomNeighbor(MazePiece* _start) {
 	std::vector<MazePiece*> m_neighborList;
 	glm::vec2 pos = _start->Position.xz;
-	if (North(pos)->Wall &&
-		!North(pos)->Traversed &&
-		North(North(pos)->Position.xz)->Wall) {
-		m_neighborList.push_back(North(North(pos)->Position.xz));
+	
+	switch (rand() % 4)
+	{
+	case 0:
+		break;
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	default:
+		break;
 	}
-	if (South(pos)->Wall &&
-		!South(pos)->Traversed &&
-		South(South(pos)->Position.xz)) {
-		m_neighborList.push_back(South(South(pos)->Position.xz));
-	}
-	if (East(pos)->Wall &&
-		!East(pos)->Traversed &&
-		East(East(pos)->Position.xz))   {
-		m_neighborList.push_back(East(East(pos)->Position.xz));
-	}
-	if (West(pos)->Wall &&
-		!West(pos)->Traversed &&
-		West(West(pos)->Position.xz))   {
-		m_neighborList.push_back(West(West(pos)->Position.xz));
-	}
-	if (m_neighborList.size() > 0) {
-		int count = m_neighborList.size();
-		return m_neighborList[rand() % count];
-	}
+
 	return nullptr;
 }
 
