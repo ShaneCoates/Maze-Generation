@@ -9,6 +9,7 @@
 #include <map>
 class RandomTraversal;
 class RandomDepthFirst;
+class RandomPrims;
 class Wilsons;
 class Camera;
 struct GLFWwindow;
@@ -44,6 +45,8 @@ public:
 	void DemonstrateRandomTraversal();
 	void InstantRandomDepthFirst();
 	void DemonstrateRandomDepthFirst();
+	void InstantRandomPrims();
+	void DemonstrateRandomPrims();
 	void InstantWilsons();
 	void DemonstrateWilsons();
 	void InstantAStar();
@@ -71,6 +74,7 @@ private:
 
 	RandomTraversal* m_randomTraversal;
 	RandomDepthFirst* m_randomDepthFirst;
+	RandomPrims* m_randomPrims;
 	Wilsons* m_wilsons;
 };
 

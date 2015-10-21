@@ -10,7 +10,7 @@ void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	m_camera = new FlyCamera(5.0f);
 	m_camera->SetInputWindow(m_window);
 	m_camera->SetPerspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
-	m_camera->SetLookAt(glm::vec3(MAZE_WIDTH * 0.05f, 10, MAZE_HEIGHT * 0.05f), glm::vec3(MAZE_WIDTH * 0.05f, 0, MAZE_HEIGHT * 0.05f), glm::vec3(0, 0, 1));
+	m_camera->SetLookAt(glm::vec3(MAZE_WIDTH * 0.05f, 7, MAZE_HEIGHT * 0.05f), glm::vec3(MAZE_WIDTH * 0.05f, 0, MAZE_HEIGHT * 0.05f), glm::vec3(0, 0, 1));
 
 	m_maze = new Maze();
 
@@ -52,9 +52,7 @@ void MazeState::DrawGUI() {
 			if (ImGui::Button("Reset")) {
 				m_maze->ResetMaze();
 			}
-			if (ImGui::Button("Flood")) {
-				m_maze->Flood();
-			}
+			
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Random Traversal")) {
@@ -81,6 +79,18 @@ void MazeState::DrawGUI() {
 			}
 			ImGui::TreePop();
 		}
+		if (ImGui::TreeNode("Random Prims")) {
+			if (ImGui::Button("Demonstrate")) {
+				m_maze->ResetMaze();
+				m_maze->DemonstrateRandomPrims();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Instant")) {
+				m_maze->ResetMaze();
+				m_maze->InstantRandomPrims();
+			}
+			ImGui::TreePop();
+		}
 	}
 		
 		/*
@@ -102,6 +112,11 @@ void MazeState::DrawGUI() {
 		if (ImGui::Button("AStar"))
 		{
 			m_maze->InstantAStar();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Flood")) 
+		{
+			m_maze->Flood();
 		}
 	}
 }

@@ -6,6 +6,7 @@
 #include <iterator>
 #include "RandomTraversal.h"
 #include "RandomDepthFirst.h"
+#include "RandomPrims.h"
 #include "Wilsons.h"
 #include "AStar.h"
 Maze::Maze() {
@@ -25,7 +26,9 @@ Maze::Maze() {
 	m_timer = 0.0f;
 	m_randomTraversal = new RandomTraversal(m_mazePieces);
 	m_randomDepthFirst = new RandomDepthFirst(m_mazePieces);
+	m_randomPrims = new RandomPrims(m_mazePieces);
 	m_wilsons = new Wilsons(m_mazePieces);
+	
 	m_position = glm::vec3(0);
 	ResetMaze();
 }
@@ -42,6 +45,7 @@ void Maze::Update(double _dt) {
 	}
 	m_randomTraversal->Update(_dt);
 	m_randomDepthFirst->Update(_dt);
+	m_randomPrims->Update(_dt);
 	m_wilsons->Update(_dt);
 	m_timer += _dt * 4;
 	
@@ -230,6 +234,12 @@ void Maze::InstantRandomDepthFirst() {
 }
 void Maze::DemonstrateRandomDepthFirst() {
 	m_randomDepthFirst->StartDemonstration();
+}
+void Maze::InstantRandomPrims() {
+	m_randomPrims->Instant();
+}
+void Maze::DemonstrateRandomPrims() {
+	m_randomPrims->StartDemonstration();
 }
 void Maze::InstantWilsons() {
 	m_wilsons->Instant();

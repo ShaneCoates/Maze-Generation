@@ -98,6 +98,7 @@
     <ClCompile Include="src\Maze.cpp" />
     <ClCompile Include="src\MazeState.cpp" />
     <ClCompile Include="src\RandomDepthFirst.cpp" />
+    <ClCompile Include="src\RandomPrims.cpp" />
     <ClCompile Include="src\RandomTraversal.cpp" />
     <ClCompile Include="src\ShaderLoader.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="inc\Maze.h" />
     <ClInclude Include="inc\MazeState.h" />
     <ClInclude Include="inc\RandomDepthFirst.h" />
+    <ClInclude Include="inc\RandomPrims.h" />
     <ClInclude Include="inc\RandomTraversal.h" />
     <ClInclude Include="inc\ShaderLoader.h" />
     <ClInclude Include="inc\Skybox.h" />
