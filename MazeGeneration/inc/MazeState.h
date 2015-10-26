@@ -37,8 +37,10 @@ private:
 
 	FlyCamera* m_camera;
 
-	Maze* m_maze;
+	Maze* m_maze[3];
+	int m_currentMaze = 0;
 
+	double m_timer;
 };
 
 #endif

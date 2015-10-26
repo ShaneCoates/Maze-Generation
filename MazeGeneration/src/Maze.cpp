@@ -90,13 +90,18 @@ void Maze::Draw(Camera* _camera) {
 			colour.a = 1.0f;
 			//colour.a = ((sin(m_timer) + 1) * 0.25f) + 0.5f;
 			if (m_wireFrame) {
-				Gizmos::addAABB(glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour);
+				Gizmos::addAABB(m_position + glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour);
 			}
 			else {
-				Gizmos::addAABBFilled(glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour, colour);
+				Gizmos::addAABBFilled(m_position + glm::vec3(i->first->Position.x * 0.1f, 0, i->first->Position.z * 0.1f), glm::vec3(0.05f, 0.025f, 0.05f), colour, colour);
 			}
 		}
 	}
+}
+
+void Maze::ClearPathfinding()
+{
+	m_floodingOpen.clear();
 }
 
 MazePiece* Maze::GetRandomNeighbor(MazePiece* _start) {

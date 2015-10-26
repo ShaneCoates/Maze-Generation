@@ -23,7 +23,13 @@ Game::Game() {
 		printf("Failed to initialise GLFW");
 		return;
 	}
-	m_gameWindow = glfwCreateWindow(1240, 768, "Assignment Two - Shane Coates", nullptr, nullptr);
+	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+	m_gameWindow = glfwCreateWindow(mode->width, mode->height, "Maze Generation - Shane Coates", glfwGetPrimaryMonitor(), nullptr);
+	//m_gameWindow = glfwCreateWindow(1240, 768, "Maze Generation - Shane Coates", nullptr, nullptr);
 	if (m_gameWindow == nullptr) {
 		printf("Failed to create Game Window");
 		glfwTerminate();

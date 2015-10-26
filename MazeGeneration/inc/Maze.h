@@ -1,7 +1,7 @@
 #ifndef _MAZE_H_
 #define	_MAZE_H_
-#define MAZE_WIDTH 50
-#define MAZE_HEIGHT 50
+#define MAZE_WIDTH 100
+#define MAZE_HEIGHT 200
 #define ITERATIONS 5
 #include "glm.hpp"
 #include <list>
@@ -51,6 +51,8 @@ public:
 	void DemonstrateWilsons();
 	void InstantAStar();
 	bool m_wireFrame;
+
+	void ClearPathfinding();
 
 	glm::vec3 m_position;
 

@@ -252,7 +252,7 @@ void Gizmos::addAABBFilled(const glm::vec3& a_center,
 	const glm::vec4& a_lineColour,
 	const glm::mat4* a_transform /* = nullptr */)
 {
-	glm::vec3 vVerts[8];
+	glm::vec3 vVerts[4];
 	glm::vec3 vX(a_rvExtents.x, 0, 0);
 	glm::vec3 vY(0, a_rvExtents.y, 0);
 	glm::vec3 vZ(0, 0, a_rvExtents.z);
@@ -274,51 +274,51 @@ void Gizmos::addAABBFilled(const glm::vec3& a_center,
 	vVerts[3] = a_center + vX - vZ - vY;
 
 	// bottom verts
-	vVerts[4] = a_center - vX - vZ + vY;
-	vVerts[5] = a_center - vX + vZ + vY;
-	vVerts[6] = a_center + vX + vZ + vY;
-	vVerts[7] = a_center + vX - vZ + vY;
+	//vVerts[4] = a_center - vX - vZ + vY;
+	//vVerts[5] = a_center - vX + vZ + vY;
+	//vVerts[6] = a_center + vX + vZ + vY;
+	//vVerts[7] = a_center + vX - vZ + vY;
 
-	if (a_lineColour != a_fillColour)
-	{
-		addLine(vVerts[0], vVerts[1], a_lineColour, a_lineColour);
-		addLine(vVerts[1], vVerts[2], a_lineColour, a_lineColour);
-		addLine(vVerts[2], vVerts[3], a_lineColour, a_lineColour);
-		addLine(vVerts[3], vVerts[0], a_lineColour, a_lineColour);
-
-		addLine(vVerts[4], vVerts[5], a_lineColour, a_lineColour);
-		addLine(vVerts[5], vVerts[6], a_lineColour, a_lineColour);
-		addLine(vVerts[6], vVerts[7], a_lineColour, a_lineColour);
-		addLine(vVerts[7], vVerts[4], a_lineColour, a_lineColour);
-
-		addLine(vVerts[0], vVerts[4], a_lineColour, a_lineColour);
-		addLine(vVerts[1], vVerts[5], a_lineColour, a_lineColour);
-		addLine(vVerts[2], vVerts[6], a_lineColour, a_lineColour);
-		addLine(vVerts[3], vVerts[7], a_lineColour, a_lineColour);
-	}
+	//if (a_lineColour != a_fillColour)
+	//{
+	//	addLine(vVerts[0], vVerts[1], a_lineColour, a_lineColour);
+	//	addLine(vVerts[1], vVerts[2], a_lineColour, a_lineColour);
+	//	addLine(vVerts[2], vVerts[3], a_lineColour, a_lineColour);
+	//	addLine(vVerts[3], vVerts[0], a_lineColour, a_lineColour);
+	//
+	//	addLine(vVerts[4], vVerts[5], a_lineColour, a_lineColour);
+	//	addLine(vVerts[5], vVerts[6], a_lineColour, a_lineColour);
+	//	addLine(vVerts[6], vVerts[7], a_lineColour, a_lineColour);
+	//	addLine(vVerts[7], vVerts[4], a_lineColour, a_lineColour);
+	//
+	//	addLine(vVerts[0], vVerts[4], a_lineColour, a_lineColour);
+	//	addLine(vVerts[1], vVerts[5], a_lineColour, a_lineColour);
+	//	addLine(vVerts[2], vVerts[6], a_lineColour, a_lineColour);
+	//	addLine(vVerts[3], vVerts[7], a_lineColour, a_lineColour);
+	//}
 	// top
 	addTri(vVerts[2], vVerts[1], vVerts[0], a_fillColour);
 	addTri(vVerts[3], vVerts[2], vVerts[0], a_fillColour);
 
 	// bottom
-	addTri(vVerts[5], vVerts[6], vVerts[4], a_fillColour);
-	addTri(vVerts[6], vVerts[7], vVerts[4], a_fillColour);
-
-	// front
-	addTri(vVerts[4], vVerts[3], vVerts[0], a_fillColour);
-	addTri(vVerts[7], vVerts[3], vVerts[4], a_fillColour);
-
-	// back
-	addTri(vVerts[1], vVerts[2], vVerts[5], a_fillColour);
-	addTri(vVerts[2], vVerts[6], vVerts[5], a_fillColour);
-
-	// left
-	addTri(vVerts[0], vVerts[1], vVerts[4], a_fillColour);
-	addTri(vVerts[1], vVerts[5], vVerts[4], a_fillColour);
-
-	// right
-	addTri(vVerts[2], vVerts[3], vVerts[7], a_fillColour);
-	addTri(vVerts[6], vVerts[2], vVerts[7], a_fillColour);
+	//addTri(vVerts[5], vVerts[6], vVerts[4], a_fillColour);
+	//addTri(vVerts[6], vVerts[7], vVerts[4], a_fillColour);
+	//
+	//// front
+	//addTri(vVerts[4], vVerts[3], vVerts[0], a_fillColour);
+	//addTri(vVerts[7], vVerts[3], vVerts[4], a_fillColour);
+	//
+	//// back
+	//addTri(vVerts[1], vVerts[2], vVerts[5], a_fillColour);
+	//addTri(vVerts[2], vVerts[6], vVerts[5], a_fillColour);
+	//
+	//// left
+	//addTri(vVerts[0], vVerts[1], vVerts[4], a_fillColour);
+	//addTri(vVerts[1], vVerts[5], vVerts[4], a_fillColour);
+	//
+	//// right
+	//addTri(vVerts[2], vVerts[3], vVerts[7], a_fillColour);
+	//addTri(vVerts[6], vVerts[2], vVerts[7], a_fillColour);
 }
 
 void Gizmos::addCylinderFilled(const glm::vec3& a_center, float a_radius, float a_fHalfLength,
