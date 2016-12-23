@@ -1,8 +1,8 @@
 #ifndef _MAZE_H_
 #define	_MAZE_H_
-#define MAZE_WIDTH 100
-#define MAZE_HEIGHT 200
-#define ITERATIONS 5
+#define MAZE_WIDTH 150
+#define MAZE_HEIGHT 150
+#define ITERATIONS 2
 #include "glm.hpp"
 #include <list>
 #include <vector>

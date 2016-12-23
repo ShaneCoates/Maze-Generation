@@ -178,7 +178,7 @@ void Maze::Flood() {
 		typedef std::map<MazePiece*, float>::iterator it_type;
 		for (it_type i = m_floodingOpen.begin(); i != m_floodingOpen.end(); i++) {
 			i->first->InOpenList = false;
-			i->first->cost = 0.0f;
+			i->first->cost = 0;
 		}
 		m_floodingOpen.clear();
 	}

@@ -9,11 +9,8 @@ void AStar::Instant(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT], MazePiece* 
 		return;
 
 
-	float _dx1;
-	float _dy1;
 	float _dx2 = _currentNode->Position.x - _end->Position.x;
 	float _dy2 = _currentNode->Position.z - _end->Position.z;
-	float _cross;
 
 	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
 		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
