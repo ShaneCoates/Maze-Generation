@@ -14,7 +14,7 @@ void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	m_camera->SetPerspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
 	m_camera->SetLookAt(glm::vec3(MAZE_WIDTH * 0.05f, 15, MAZE_HEIGHT * 0.05f), glm::vec3(MAZE_WIDTH * 0.05f, 0, MAZE_HEIGHT * 0.05f), glm::vec3(0, 0, 1));
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < MAZE_COUNT; i++)
 	{
 		m_maze[i] = new Maze();
 		m_maze[i]->m_position.x -= (i * (MAZE_WIDTH * 0.11f));
@@ -62,7 +62,7 @@ void MazeState::Update(double _dt) {
 
 
 	m_camera->Update(_dt);
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < MAZE_COUNT; i++)
 	{
 		m_maze[i]->Update(_dt);
 	}
@@ -71,7 +71,7 @@ void MazeState::Draw() {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	Gizmos::clear();
 	glEnable(GL_DEPTH_TEST);
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < MAZE_COUNT; i++)
 	{
 		m_maze[i]->Draw(m_camera);
 	}
@@ -82,7 +82,7 @@ void MazeState::Draw() {
 }
 
 void MazeState::DrawGUI() {
-	//ImGui::SliderInt("Maze", &m_currentMaze, 0, 2);
+	ImGui::SliderInt("Maze", &m_currentMaze, 0, 2);
 	if (ImGui::CollapsingHeader("Maze Generation")) {
 			if (ImGui::TreeNode("General")) {
 				ImGui::Checkbox("Wireframe", &m_maze[m_currentMaze]->m_wireFrame);

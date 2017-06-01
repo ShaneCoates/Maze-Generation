@@ -4,7 +4,7 @@ Author: Shane Coates
 
 #ifndef _MAZE_GAMESTATE_H_
 #define	_MAZE_GAMESTATE_H_
-
+#define MAZE_COUNT 1
 #include <gl_core_4_4.h>
 #include "GameStateManager.h"
 struct GLFWwindow;
@@ -37,7 +37,7 @@ private:
 
 	FlyCamera* m_camera;
 
-	Maze* m_maze[3];
+	Maze* m_maze[MAZE_COUNT];
 	int m_currentMaze = 0;
 
 	double m_timer;
