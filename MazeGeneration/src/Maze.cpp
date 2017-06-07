@@ -4,11 +4,13 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include "MazeRenderer.h"
 #include "RandomTraversal.h"
 #include "RandomDepthFirst.h"
 #include "RandomPrims.h"
 #include "Wilsons.h"
 #include "AStar.h"
+
 Maze::Maze() {
 	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
 		for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {
@@ -31,6 +33,7 @@ Maze::Maze() {
 	
 	m_position = glm::vec3(0);
 	ResetMaze();
+
 }
 Maze::~Maze() {
 
@@ -48,7 +51,6 @@ void Maze::Update(double _dt) {
 	m_randomPrims->Update(_dt);
 	m_wilsons->Update(_dt);
 	m_timer += _dt * 4;
-	
 }
 
 void Maze::Draw(Camera* _camera) {
@@ -255,4 +257,14 @@ void Maze::DemonstrateWilsons() {
 void Maze::InstantAStar()
 {
 	AStar::Instant(m_mazePieces, m_mazePieces[0][1], m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1], m_floodingOpen);
+}
+glm::vec4 Maze::GetPieceColor(unsigned int _x, unsigned int _y)
+{
+	MazePiece* mp = m_mazePieces[_x][_y];
+	glm::vec4 pColour = glm::vec4(1);
+	if (mp->Wall)
+		pColour = glm::vec4(0, 0, 0, 1);
+	if(mp->InOpenList)
+		pColour = glm::vec4(1, 0, 0, 1);
+	return pColour;
 }

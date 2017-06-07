@@ -5,7 +5,7 @@
 #include "Maze.h"
 #include "GLFW\glfw3.h"
 #include "imgui_impl_glfw_gl3.h"
-
+#include "MazeRenderer.h"
 void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	m_window = _window;
 	m_gameStateManager = _gameStateManager;
@@ -18,6 +18,7 @@ void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	{
 		m_maze[i] = new Maze();
 		m_maze[i]->m_position.x -= (i * (MAZE_WIDTH * 0.11f));
+		m_mazeRenderers[i] = new MazeRenderer();
 	}
 
 	Gizmos::create(0, ((MAZE_HEIGHT * MAZE_WIDTH) + 2) * 36);
@@ -71,11 +72,14 @@ void MazeState::Draw() {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	Gizmos::clear();
 	glEnable(GL_DEPTH_TEST);
-	for (int i = 0; i < 1; i++)
-	{
-		m_maze[i]->Draw(m_camera);
-	}
-	
+
+	//for (int i = 0; i < 1; i++)
+	//{
+	//	m_maze[i]->Draw(m_camera);
+	//}
+	m_mazeRenderers[0]->UpdateTexture(m_maze[0]);
+
+	m_mazeRenderers[0]->Draw();
 
 	Gizmos::draw(m_camera->GetProjectionView());
 	DrawGUI();

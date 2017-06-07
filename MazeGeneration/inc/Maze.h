@@ -1,18 +1,22 @@
 #ifndef _MAZE_H_
 #define	_MAZE_H_
-#define MAZE_WIDTH 150
-#define MAZE_HEIGHT 150
+
 #define ITERATIONS 2
 #include "glm.hpp"
 #include <list>
 #include <vector>
 #include <map>
+
 class RandomTraversal;
 class RandomDepthFirst;
 class RandomPrims;
 class Wilsons;
 class Camera;
 struct GLFWwindow;
+
+static const unsigned int MAZE_WIDTH = 64;
+static const unsigned int MAZE_HEIGHT = 64;
+
 struct MazePiece {
 	glm::vec3 Position;
 	bool Wall;
@@ -53,6 +57,8 @@ public:
 	bool m_wireFrame;
 
 	void ClearPathfinding();
+
+	glm::vec4 GetPieceColor(unsigned int _x, unsigned int _y);
 
 	glm::vec3 m_position;
 

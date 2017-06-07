@@ -10,6 +10,7 @@ Author: Shane Coates
 struct GLFWwindow;
 class FlyCamera;
 class Maze;
+class MazeRenderer;
 class MazeState : public IGameState
 {
 public:
@@ -40,7 +41,10 @@ private:
 	Maze* m_maze[3];
 	int m_currentMaze = 0;
 
+	MazeRenderer* m_mazeRenderers[3];
+
 	double m_timer;
+
 };
 
 #endif
