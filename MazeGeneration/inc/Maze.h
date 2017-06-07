@@ -2,6 +2,7 @@
 #define	_MAZE_H_
 
 #define ITERATIONS 2
+
 #include "glm.hpp"
 #include <list>
 #include <vector>
