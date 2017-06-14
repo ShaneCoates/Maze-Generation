@@ -18,7 +18,7 @@ void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	{
 		m_maze[i] = new Maze();
 		m_maze[i]->m_position.x -= (i * (MAZE_WIDTH * 0.11f));
-		m_mazeRenderers[i] = new MazeRenderer();
+		m_mazeRenderers[i] = new MazeRenderer(m_window);
 	}
 
 	Gizmos::create(0, ((MAZE_HEIGHT * MAZE_WIDTH) + 2) * 36);
@@ -66,6 +66,7 @@ void MazeState::Update(double _dt) {
 	for (int i = 0; i < MAZE_COUNT; i++)
 	{
 		m_maze[i]->Update(_dt);
+		m_mazeRenderers[i]->Update(_dt);
 	}
 }
 void MazeState::Draw() {

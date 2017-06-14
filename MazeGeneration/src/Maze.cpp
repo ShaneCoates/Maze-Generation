@@ -261,7 +261,7 @@ void Maze::InstantAStar()
 glm::vec4 Maze::GetPieceColor(unsigned int _x, unsigned int _y)
 {
 	MazePiece* mp = m_mazePieces[_x][_y];
-	glm::vec4 pColour = glm::vec4(1);
+	glm::vec4 pColour = glm::vec4(1, 1, 1, 0);
 	if (mp->Wall)
 		pColour = glm::vec4(0, 0, 0, 1);
 	if(mp->InOpenList)
