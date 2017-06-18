@@ -3,6 +3,8 @@
 #include "ShaderLoader.h"
 #include "Camera.h"
 #include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
+#include "MazeState.h"
 MazeRenderer::MazeRenderer(GLFWwindow* _window)
 {
 
@@ -17,8 +19,8 @@ MazeRenderer::MazeRenderer(GLFWwindow* _window)
 	glGenTextures(1, &m_textureID);
 	glBindTexture(GL_TEXTURE_2D, m_textureID);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -44,7 +46,7 @@ MazeRenderer::MazeRenderer(GLFWwindow* _window)
 	m_ambientLoc = glGetUniformLocation(m_programID, "m_ambient");
 	m_light0PosLoc = glGetUniformLocation(m_programID, "m_light0Position");
 	m_light0ColorLoc = glGetUniformLocation(m_programID, "m_light0Color");
-	
+	m_texSizeLoc = glGetUniformLocation(m_programID, "m_texSize");
 	
 }
 
@@ -55,6 +57,20 @@ MazeRenderer::~MazeRenderer()
 
 void MazeRenderer::Update(double _dt)
 {
+	if (glfwGetKey(m_window, GLFW_KEY_G))
+	{
+		if(!toggleGUIButtonDown)
+			showGUI = !showGUI;
+
+		toggleGUIButtonDown = true;
+	}
+	else
+	{
+		toggleGUIButtonDown = false;
+	}
+
+
+
 	if (glfwGetKey(m_window, GLFW_KEY_A))
 		m_eye -= m_camRight * m_moveSpeed;
 	else if (glfwGetKey(m_window, GLFW_KEY_D))
@@ -110,14 +126,18 @@ void MazeRenderer::Update(double _dt)
 
 void MazeRenderer::Draw()
 {
-	ImGui::SliderInt("Raymarch steps", &m_rmSteps, 0, 1000);
-	ImGui::SliderFloat("Far Clipping plane", &m_zFar, 0, 1000);
+	if (showGUI)
+	{
+		ImGui::SliderInt("Raymarch steps", &m_rmSteps, 0, 1000);
+		ImGui::SliderFloat("Far Clipping plane", &m_zFar, 0, 1000);
 
-	ImGui::ColorEdit4("Sky Color", glm::value_ptr(m_skyColor));
+		ImGui::ColorEdit4("Sky Color", glm::value_ptr(m_skyColor));
 
-	ImGui::ColorEdit4("Ambient Color", glm::value_ptr(m_ambient));
-	ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light0Position), -10.0f, 10.0f);
-	ImGui::ColorEdit4("Light Color", glm::value_ptr(m_light0Color));
+		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(m_ambient));
+		ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light0Position), -100.0f, 100.0f);
+		ImGui::ColorEdit4("Light Color", glm::value_ptr(m_light0Color));
+
+	}
 	glUseProgram(m_programID);
 
 	glBindVertexArray(m_vao);
@@ -147,7 +167,7 @@ void MazeRenderer::Draw()
 	glUniform4fv(m_ambientLoc, 1, value_ptr(m_ambient));
 	glUniform3fv(m_light0PosLoc, 1, value_ptr(m_light0Position));
 	glUniform4fv(m_light0ColorLoc, 1, value_ptr(m_light0Color));
-
+	glUniform1i(m_texSizeLoc, MAZE_WIDTH);
 
 
 

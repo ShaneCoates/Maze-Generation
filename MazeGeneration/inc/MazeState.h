@@ -11,6 +11,8 @@ struct GLFWwindow;
 class FlyCamera;
 class Maze;
 class MazeRenderer;
+
+
 class MazeState : public IGameState
 {
 public:
@@ -29,6 +31,8 @@ public:
 	void Update(double _dt);
 	void Draw();
 
+
+
 private:
 
 	void DrawGUI();
@@ -45,6 +49,8 @@ private:
 
 	double m_timer;
 
+	bool toggleGUIButtonDown = false;
+	bool showGUI = true;
 };
 
 #endif

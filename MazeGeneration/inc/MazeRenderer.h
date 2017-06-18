@@ -43,7 +43,7 @@ private:
 	glm::vec3 m_camUp = glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));	// The upward-vector of the image plane
 	glm::vec3 m_camRight = glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f));	// The right-vector of the image plane
 	glm::vec3 m_camForward = cross(m_camRight, m_camUp);			// The forward-vector of the image plane
-	glm::vec3 m_eye = glm::vec3(0.0f, 0.0f, -2.0f);				// The eye position in the world
+	glm::vec3 m_eye = glm::vec3(0.0f, 5.0f, -2.0f);				// The eye position in the world
 	float m_focalLength = 1.67f;								// Distance between eye and image-plane
 	float m_zNear = 0.0f;									// Near plane distance from camera
 	float m_zFar = 100.0f;								// Far plane distance from camera
@@ -58,8 +58,8 @@ private:
 	glm::vec3 m_light0Position = glm::vec3(0.25f, 2.0f, 0.0f);
 	glm::vec4 m_light0Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
 
-	const int m_windowWidth = 1920;
-	const int m_windowHeight = 1080;
+	const int m_windowWidth = 1280;
+	const int m_windowHeight = 720;
 	float m_aspectRatio = m_windowWidth / (float)m_windowHeight;
 
 	GLuint m_resolutionLoc;
@@ -77,7 +77,10 @@ private:
 	GLuint m_ambientLoc;
 	GLuint m_light0PosLoc;
 	GLuint m_light0ColorLoc;
+	GLuint m_texSizeLoc;
 
+	bool toggleGUIButtonDown = false;
+	bool showGUI = true;
 };
 
 #endif

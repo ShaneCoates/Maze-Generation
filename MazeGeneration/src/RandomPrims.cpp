@@ -33,7 +33,7 @@ void RandomPrims::StartDemonstration() {
 		m_open.push_back(m_mazePieces[1][1]);
 		m_mazePieces[1][1]->Traversed = true;
 		m_mazePieces[1][1]->InOpenList = true;
-		m_mazePieces[0][1]->Wall = false;
+		//m_mazePieces[0][1]->Wall = false;
 		m_demonstrating = true;
 	}
 
@@ -119,7 +119,7 @@ void RandomPrims::Demonstrate() {
 	}
 	else {
 		m_demonstrating = false;
-		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1]->Wall = false;
+		//m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1]->Wall = false;
 		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 2]->Wall = false;
 		m_mazePieces[MAZE_WIDTH - 3][MAZE_HEIGHT - 2]->Wall = false;
 		for (unsigned int x = 0; x < MAZE_WIDTH; x++) {

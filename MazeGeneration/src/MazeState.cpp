@@ -23,6 +23,8 @@ void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 
 	Gizmos::create(0, ((MAZE_HEIGHT * MAZE_WIDTH) + 2) * 36);
 	m_timer = 30;
+
+	showGUI = true;
 }
 
 MazeState::~MazeState() {
@@ -59,6 +61,17 @@ void MazeState::Update(double _dt) {
 	//	//m_maze[2]->InstantAStar();
 	//	m_timer = 0;
 	//}
+	if (glfwGetKey(m_window, GLFW_KEY_G))
+	{
+		if (!toggleGUIButtonDown)
+			showGUI = !showGUI;
+
+		toggleGUIButtonDown = true;
+	}
+	else
+	{
+		toggleGUIButtonDown = false;
+	}
 
 
 
@@ -73,6 +86,8 @@ void MazeState::Draw() {
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	//Gizmos::clear();
 	glEnable(GL_DEPTH_TEST);
+	if (showGUI)
+		ImGui_ImplGlfwGL3_NewFrame();
 
 	//for (int i = 0; i < 1; i++)
 	//{
@@ -84,11 +99,17 @@ void MazeState::Draw() {
 
 	//Gizmos::draw(m_camera->GetProjectionView());
 	DrawGUI();
+
+	if (showGUI)
+		ImGui::Render();
+
 }
 
 void MazeState::DrawGUI() {
-	ImGui::SliderInt("Maze", &m_currentMaze, 0, 2);
-	if (ImGui::CollapsingHeader("Maze Generation")) {
+	if (showGUI)
+	{
+		//ImGui::SliderInt("Maze", &m_currentMaze, 0, 2);
+		if (ImGui::CollapsingHeader("Maze Generation")) {
 			if (ImGui::TreeNode("General")) {
 				ImGui::Checkbox("Wireframe", &m_maze[m_currentMaze]->m_wireFrame);
 				if (ImGui::Button("Stop")) {
@@ -138,7 +159,7 @@ void MazeState::DrawGUI() {
 				ImGui::TreePop();
 			}
 		}
-	
+
 		/*
 		if (ImGui::TreeNode("Wilsons")) {
 			if (ImGui::Button("Demonstrate")) {
@@ -171,4 +192,5 @@ void MazeState::DrawGUI() {
 				m_maze[m_currentMaze]->ClearPathfinding();
 			}
 		}
+	}
 }
