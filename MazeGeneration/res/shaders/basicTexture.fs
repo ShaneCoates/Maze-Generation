@@ -28,6 +28,8 @@ uniform vec4 m_ambient;
 uniform vec3 m_light0Position;
 uniform vec4 m_light0Color;
 
+uniform int m_texSize;
+
 // Rotates a point t radians around the y-axis
 vec3 rotateY(vec3 v, float t)
 {
@@ -51,13 +53,6 @@ float mapTo(float x, float minX, float maxX, float minY, float maxY)
 	return a * x + b;
 }
 
-
-// Subtracts d1 from d0, assuming d1 is a signed distance
-float opSubtract(float d0, float d1)
-{
-	return max(d0, -d1);
-}
-
 // Returns the signed distance to a sphere at the origin
 float sdSphere(vec3 p, float radius)
 {
@@ -70,11 +65,6 @@ float udBox(vec3 p, vec3 size)
 	return length(max(abs(p) - size, vec3(0.0f)));
 }
 
-float udRoundBox( vec3 p, vec3 b, float r )
-{
-  return length(max(abs(p)-b,0.0))-r;
-}
-
 // Returns the signed distance estimate to a box at the origin of the given size
 float sdBox(vec3 p, vec3 size)
 {
@@ -82,12 +72,74 @@ float sdBox(vec3 p, vec3 size)
 	return min(max(d.x, max(d.y, d.z)), 0.0f) + udBox(p, size);
 }
 
+// Subtracts d1 from d0, assuming d1 is a signed distance
+float opSubtract(float d0, float d1)
+{
+	return max(d0, -d1);
+}
 
+// Calcs intersection and exit distances, and normal at intersection
+//
+// The box is axis aligned and at the origin, but has any size.
+// For arbirarily oriented and located boxes, simply transform
+// the ray accordingly and reverse the transformation for the
+// returning normal(without translation)
+//
+vec2 boxIntersection( vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal ) 
+{
+    vec3 m = 1.0/rd;
+    vec3 n = m*ro;
+    vec3 k = abs(m)*boxSize;
+	
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+
+    float tN = max( max( t1.x, t1.y ), t1.z );
+    float tF = min( min( t2.x, t2.y ), t2.z );
+	
+    if( tN > tF || tF < 0.0) return vec2(-1.0); // no intersection
+    
+    outNormal = -sign(rd)*step(t1.yzx,t1.xyz)*step(t1.zxy,t1.xyz);
+
+    return vec2( tN, tF );
+}
+
+//Check if ray intersects plane
+float rayPlaneIntersect(vec3 ro, vec3 rd, vec3 n, vec3 c)
+{
+	float denom = dot(n, rd);
+	if(abs(denom) > m_rmEpsilon)
+	{
+		float t = dot((c - ro), n) / denom;
+		if(t >= m_rmEpsilon) return t;
+	}
+	return 0.0f;
+}
 // Defines the distance field for the scene
 float distScene(vec3 p)
 {
-	p.xz = mod(p.xz, 1.0f);
-	return sdBox(p - vec3(0.5f, 0.0f, 0.5f), vec3(0.45f));
+	//p.xz = mod(p.xz, 1.0f);
+	float closest = 100;
+	vec3 flooredP = vec3(floor(p.x), p.y, floor(p.z));
+	if(texture(tex, p.xz / m_texSize).a > 0)
+	{
+		return sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
+	}
+	else
+	{
+		for(int x = -1; x <= 1; x++)
+		{
+			for(int z = -1; z <= 1; z++)
+			{
+				if(texture(tex, (p.xz + vec2(x, z)) / m_texSize).a > 0)
+					closest = min(closest, sdBox(p - vec3(flooredP.x + x + 0.5f, 0.0f, flooredP.z + z + 0.5f), vec3(0.5f)));
+			}
+		}
+	}
+	return closest;
+	//return sdBox(p - vec3(floor(p.x) + 0.5f, 0.0f, floor(p.z) + 0.5f), vec3(0.45f));
+
+
 	//return sdSphere(p - vec3(0.0f, -0.25f, 0.0f), 0.25f);
 
 	// p = rotateY(p, 0.5f * p.y);
@@ -97,12 +149,14 @@ float distScene(vec3 p)
 }
 
 
+
 // Finds the closest intersecting object along the ray at origin ro, and direction rd.
 // i: step count
 // t: distance traveled by the ray
 void raymarch(vec3 ro, vec3 rd, out int i, out float t)
 {
-	t = 0.0f;
+	t = rayPlaneIntersect(ro, rd, vec3(0, 1, 0), vec3(0, 1, 0));
+	
 	for(i = 0; i < m_rmSteps; ++i)
 	{
 		float dist = distScene(ro + rd * t);
@@ -181,7 +235,7 @@ vec4 getShadingWithTexture(vec3 p, vec3 normal, vec3 lightPos, vec4 lightColor)
 		intensity = clamp(dot(normal, lightDirection), 0, 1) * vis;
 	}
 
-	return lightColor * intensity + m_ambient * (1.0f - intensity) * texture(tex, p.xz / 64);
+	return lightColor * intensity + m_ambient * (1.0f - intensity) * texture(tex, p.xz / m_texSize);
 }
 
 // Compute an ambient occlusion factor
