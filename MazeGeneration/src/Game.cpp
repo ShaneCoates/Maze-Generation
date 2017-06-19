@@ -29,7 +29,7 @@ Game::Game() {
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 	//m_gameWindow = glfwCreateWindow(mode->width, mode->height, "Maze Generation - Shane Coates", glfwGetPrimaryMonitor(), nullptr);
-	m_gameWindow = glfwCreateWindow(1920, 1080, "Maze Generation - Shane Coates", nullptr, nullptr);
+	m_gameWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Maze Generation - Shane Coates", nullptr, nullptr);
 	if (m_gameWindow == nullptr) {
 		printf("Failed to create Game Window");
 		glfwTerminate();

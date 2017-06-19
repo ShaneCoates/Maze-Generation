@@ -21,6 +21,9 @@ public:
 	//Main Game loop
 	void Run();
 
+	static const unsigned int WINDOW_WIDTH = 1920;
+	static const unsigned int WINDOW_HEIGHT = 1080;
+
 protected:
 private:
 	//Function to return DeltaTime

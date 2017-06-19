@@ -4,7 +4,7 @@
 #include "glm.hpp"
 #include <gl_core_4_4.h>
 #include "GLFW\glfw3.h"
-
+#include "Game.h"
 class Maze;
 class MazeRenderer
 {
@@ -20,6 +20,8 @@ public:
 protected:
 private:
 	
+	void CreateProgram();
+
 	GLFWwindow* m_window;
 
 	unsigned int m_programID;
@@ -58,8 +60,8 @@ private:
 	glm::vec3 m_light0Position = glm::vec3(0.25f, 2.0f, 0.0f);
 	glm::vec4 m_light0Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
 
-	const int m_windowWidth = 1920;
-	const int m_windowHeight = 1080;
+	const int m_windowWidth = Game::WINDOW_WIDTH;
+	const int m_windowHeight = Game::WINDOW_HEIGHT;
 	float m_aspectRatio = m_windowWidth / (float)m_windowHeight;
 
 	GLuint m_resolutionLoc;

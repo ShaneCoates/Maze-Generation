@@ -51,6 +51,13 @@ float mapTo(float x, float minX, float maxX, float minY, float maxY)
 	return a * x + b;
 }
 
+
+// Subtracts d1 from d0, assuming d1 is a signed distance
+float opSubtract(float d0, float d1)
+{
+	return max(d0, -d1);
+}
+
 // Returns the signed distance to a sphere at the origin
 float sdSphere(vec3 p, float radius)
 {
@@ -61,6 +68,11 @@ float sdSphere(vec3 p, float radius)
 float udBox(vec3 p, vec3 size)
 {
 	return length(max(abs(p) - size, vec3(0.0f)));
+}
+
+float udRoundBox( vec3 p, vec3 b, float r )
+{
+  return length(max(abs(p)-b,0.0))-r;
 }
 
 // Returns the signed distance estimate to a box at the origin of the given size
@@ -84,11 +96,6 @@ float distScene(vec3 p)
 	// return opSubtract(d1, d2);
 }
 
-// Subtracts d1 from d0, assuming d1 is a signed distance
-float opSubtract(float d0, float d1)
-{
-	return max(d0, -d1);
-}
 
 // Finds the closest intersecting object along the ray at origin ro, and direction rd.
 // i: step count

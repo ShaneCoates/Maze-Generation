@@ -6,12 +6,13 @@
 #include "GLFW\glfw3.h"
 #include "imgui_impl_glfw_gl3.h"
 #include "MazeRenderer.h"
+#include "Game.h"
 void MazeState::Init(GLFWwindow* _window, GameStateManager* _gameStateManager) {
 	m_window = _window;
 	m_gameStateManager = _gameStateManager;
 	m_camera = new FlyCamera(5.0f);
 	m_camera->SetInputWindow(m_window);
-	m_camera->SetPerspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
+	m_camera->SetPerspective(glm::pi<float>() * 0.25f, Game::WINDOW_WIDTH / Game::WINDOW_HEIGHT, 0.1f, 1000.0f);
 	m_camera->SetLookAt(glm::vec3(MAZE_WIDTH * 0.05f, 15, MAZE_HEIGHT * 0.05f), glm::vec3(MAZE_WIDTH * 0.05f, 0, MAZE_HEIGHT * 0.05f), glm::vec3(0, 0, 1));
 
 	for (int i = 0; i < MAZE_COUNT; i++)
