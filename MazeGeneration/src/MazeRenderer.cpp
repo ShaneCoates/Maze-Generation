@@ -173,22 +173,22 @@ void MazeRenderer::CreateProgram()
 
 void MazeRenderer::UpdateTexture(Maze* _maze)
 {
-	GLubyte m_pixelData[MAZE_WIDTH][MAZE_HEIGHT][4];
+	GLubyte m_pixelData[MAZE_WIDTH][MAZE_HEIGHT];// [4];
 	glm::vec4 currentColor = glm::vec4(0.0f);
 	for (int x = 0; x < MAZE_WIDTH; x++)
 	{
 		for (int y = 0; y < MAZE_HEIGHT; y++)
 		{
 			currentColor = _maze->GetPieceColor(x, y);
-			m_pixelData[x][y][0] = (GLubyte)(currentColor.r * 255);
-			m_pixelData[x][y][1] = (GLubyte)(currentColor.g * 255);
-			m_pixelData[x][y][2] = (GLubyte)(currentColor.b * 255);
-			m_pixelData[x][y][3] = (GLubyte)(currentColor.a * 255);
+			m_pixelData[x][y] = (GLubyte)(currentColor.r * 255);
+			//m_pixelData[x][y][1] = (GLubyte)(currentColor.g * 255);
+			//m_pixelData[x][y][2] = (GLubyte)(currentColor.b * 255);
+			//m_pixelData[x][y][3] = (GLubyte)(currentColor.a * 255);
 		}
 	}
 	
 	glBindTexture(GL_TEXTURE_2D, m_textureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MAZE_WIDTH, MAZE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pixelData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, MAZE_WIDTH, MAZE_HEIGHT, 0, GL_RED, GL_UNSIGNED_BYTE, m_pixelData);
 
 }

@@ -15,8 +15,8 @@ class Wilsons;
 class Camera;
 struct GLFWwindow;
 
-static const unsigned int MAZE_WIDTH = 64;
-static const unsigned int MAZE_HEIGHT = 64;
+static const unsigned int MAZE_WIDTH = 32;
+static const unsigned int MAZE_HEIGHT = 32;
 
 struct MazePiece {
 	glm::vec3 Position;

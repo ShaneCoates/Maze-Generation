@@ -122,7 +122,7 @@ float distScene(vec3 ro, vec3 rd, float t)
 	vec3 p = ro + rd * t;
 	float closest = 100;
 	vec3 flooredP = vec3(floor(p.x), p.y, floor(p.z));
-	if(texture(tex, p.xz / m_texSize).a > 0)
+	if(texture(tex, p.xz / m_texSize).r > 0)
 	{
 		return sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
 	}
@@ -130,26 +130,26 @@ float distScene(vec3 ro, vec3 rd, float t)
 	{
 		if(rd.x > 0)
 		{
-			if(texture(tex, (p.xz + vec2(1, 0)) / m_texSize).a > 0)			
+			if(texture(tex, (p.xz + vec2(1, 0)) / m_texSize).r > 0)			
 				closest = sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
 			if(rd.z > 0)
 			{
-				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).a > 0)		
+				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
 				}
-				else if(texture(tex, (p.xz + vec2(1, 1)) / m_texSize).a > 0)		
+				else if(texture(tex, (p.xz + vec2(1, 1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
 				}
 			}
 			else
 			{
-				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).a > 0)		
+				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
 				}
-				else if(texture(tex, (p.xz + vec2(1, -1)) / m_texSize).a > 0)		
+				else if(texture(tex, (p.xz + vec2(1, -1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
 				}
@@ -158,26 +158,26 @@ float distScene(vec3 ro, vec3 rd, float t)
 		}
 		else
 		{
-			if(texture(tex, (p.xz + vec2(-1, 0)) / m_texSize).a > 0)		
+			if(texture(tex, (p.xz + vec2(-1, 0)) / m_texSize).r > 0)		
 				closest = sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
 			if(rd.z > 0)
 			{
-				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).a > 0)		
+				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
 				}
-				else if(texture(tex, (p.xz + vec2(-1, 1)) / m_texSize).a > 0)		
+				else if(texture(tex, (p.xz + vec2(-1, 1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
 				}
 			}
 			else
 			{
-				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).a > 0)		
+				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
 				}
-				if(texture(tex, (p.xz + vec2(-1, -1)) / m_texSize).a > 0)		
+				if(texture(tex, (p.xz + vec2(-1, -1)) / m_texSize).r > 0)		
 				{
 					closest = min(closest, sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
 				}
