@@ -166,6 +166,8 @@ void Maze::ResetMaze() {
 			m_mazePieces[x][z]->Wall = true;
 			m_mazePieces[x][z]->Traversed = false;
 			m_mazePieces[x][z]->InOpenList = false;
+			m_mazePieces[x][z]->AStarPath = false;
+
 			m_mazePieces[x][z]->cost = 0;
 		}
 	}
@@ -264,6 +266,8 @@ glm::vec4 Maze::GetPieceColor(unsigned int _x, unsigned int _y)
 	glm::vec4 pColour = glm::vec4(0);
 	if (mp->Wall)
 		pColour = glm::vec4(1);
+	if (mp->AStarPath)
+		pColour = glm::vec4(0.1f);
 	//if(mp->InOpenList)
 //		pColour = glm::vec4(1, 0, 0, 1);
 //	if(mp->AStarPath)

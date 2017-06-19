@@ -115,6 +115,20 @@ float rayPlaneIntersect(vec3 ro, vec3 rd, vec3 n, vec3 c)
 	}
 	return 0.0f;
 }
+
+bool sdFromTex(vec3 p, vec2 o, inout float dist)
+{
+	if(texture(tex, (p.xz + o) / m_texSize).r > 0.5f)
+	{
+		dist = min(dist, sdBox(p - vec3(floor(p.x) + o.x + 0.5f, 0.0f, floor(p.z) + o.y + 0.5f), vec3(0.5f)));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Defines the distance field for the scene
 float distScene(vec3 ro, vec3 rd, float t)
 {
@@ -122,65 +136,40 @@ float distScene(vec3 ro, vec3 rd, float t)
 	vec3 p = ro + rd * t;
 	float closest = 100;
 	vec3 flooredP = vec3(floor(p.x), p.y, floor(p.z));
-	if(texture(tex, p.xz / m_texSize).r > 0)
+	if(sdFromTex(p, vec2(0), closest))
 	{
-		return sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
+		return closest;
 	}
 	else
 	{
+		closest = 100;
 		if(rd.x > 0)
 		{
-			if(texture(tex, (p.xz + vec2(1, 0)) / m_texSize).r > 0)			
-				closest = sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
+			sdFromTex(p, vec2(1, 0), closest);
 			if(rd.z > 0)
 			{
-				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
-				}
-				else if(texture(tex, (p.xz + vec2(1, 1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
-				}
+				if(!sdFromTex(p, vec2(0, 1), closest))
+					sdFromTex(p, vec2(1, 1), closest);
 			}
 			else
 			{
-				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
-				}
-				else if(texture(tex, (p.xz + vec2(1, -1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
-				}
-				
+				if(!sdFromTex(p, vec2(0, -1), closest))
+					sdFromTex(p, vec2(1, -1), closest);			
 			}
 		}
 		else
 		{
-			if(texture(tex, (p.xz + vec2(-1, 0)) / m_texSize).r > 0)		
-				closest = sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
+			sdFromTex(p, vec2(-1, 0), closest);
+			
 			if(rd.z > 0)
 			{
-				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
-				}
-				else if(texture(tex, (p.xz + vec2(-1, 1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
-				}
+				if(!sdFromTex(p, vec2(0, 1), closest))
+					sdFromTex(p, vec2(-1, 1), closest);
 			}
 			else
 			{
-				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
-				}
-				if(texture(tex, (p.xz + vec2(-1, -1)) / m_texSize).r > 0)		
-				{
-					closest = min(closest, sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
-				}
+				if(!sdFromTex(p, vec2(0, -1), closest))
+					sdFromTex(p, vec2(-1, -1), closest);
 			}
 		}
 		return closest;
@@ -298,8 +287,14 @@ float ambientOcclusion(vec3 p, vec3 n)
 // Create a checkboard texture
 vec4 getFloorTexture(vec3 p)
 {
-	vec2 m = mod(p.xz, 2.0f) - vec2(1.0f);
-	return vec4(1.0f);//m.x * m.y > 0.0f ? vec4(0.1f) : vec4(1.0f);
+	//vec2 m = mod(p.xz, 2.0f) - vec2(1.0f);
+	//return m.x * m.y > 0.0f ? vec4(0.1f) : vec4(1.0f);
+	vec4 col = vec4(0.1f);
+	if(texture(tex, p.xz / m_texSize).r > 0f)
+	{
+		col.r = 0.5f;
+	}
+	return col;
 }
 
 // To improve performance we raytrace the floor
