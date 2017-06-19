@@ -20,6 +20,8 @@ public:
 protected:
 private:
 	
+	void CreateProgram();
+
 	GLFWwindow* m_window;
 
 	unsigned int m_programID;
@@ -55,7 +57,7 @@ private:
 
 	glm::vec4 m_skyColor = glm::vec4(0.31f, 0.47f, 0.67f, 1.0f);
 	glm::vec4 m_ambient = glm::vec4(0.15, 0.2f, 0.32f, 1.0f);
-	glm::vec3 m_light0Position = glm::vec3(0.25f, 2.0f, 0.0f);
+	glm::vec3 m_light0Position = glm::vec3(0.25f, 20.0f, 0.0f);
 	glm::vec4 m_light0Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
 
 	const int m_windowWidth = 1280;
@@ -80,7 +82,6 @@ private:
 	GLuint m_texSizeLoc;
 
 	bool toggleGUIButtonDown = false;
-	bool showGUI = true;
 };
 
 #endif

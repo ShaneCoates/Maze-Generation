@@ -113,8 +113,8 @@ void RandomTraversal::Demonstrate() {
 	else {
 		m_demonstrating = false;
 		//m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1]->Wall = false;
-		m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 2]->Wall = false;
-		m_mazePieces[MAZE_WIDTH - 3][MAZE_HEIGHT - 2]->Wall = false;
+		//m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 2]->Wall = false;
+		//m_mazePieces[MAZE_WIDTH - 3][MAZE_HEIGHT - 2]->Wall = false;
 
 		for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
 			for (unsigned int z = 0; z < MAZE_HEIGHT; z++) {

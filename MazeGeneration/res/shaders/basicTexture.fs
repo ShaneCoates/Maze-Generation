@@ -116,9 +116,10 @@ float rayPlaneIntersect(vec3 ro, vec3 rd, vec3 n, vec3 c)
 	return 0.0f;
 }
 // Defines the distance field for the scene
-float distScene(vec3 p)
+float distScene(vec3 ro, vec3 rd, float t)
 {
 	//p.xz = mod(p.xz, 1.0f);
+	vec3 p = ro + rd * t;
 	float closest = 100;
 	vec3 flooredP = vec3(floor(p.x), p.y, floor(p.z));
 	if(texture(tex, p.xz / m_texSize).a > 0)
@@ -127,14 +128,62 @@ float distScene(vec3 p)
 	}
 	else
 	{
-		for(int x = -1; x <= 1; x++)
+		if(rd.x > 0)
 		{
-			for(int z = -1; z <= 1; z++)
+			if(texture(tex, (p.xz + vec2(1, 0)) / m_texSize).a > 0)			
+				closest = sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
+			if(rd.z > 0)
 			{
-				if(texture(tex, (p.xz + vec2(x, z)) / m_texSize).a > 0)
-					closest = min(closest, sdBox(p - vec3(flooredP.x + x + 0.5f, 0.0f, flooredP.z + z + 0.5f), vec3(0.5f)));
+				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
+				}
+				else if(texture(tex, (p.xz + vec2(1, 1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
+				}
+			}
+			else
+			{
+				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
+				}
+				else if(texture(tex, (p.xz + vec2(1, -1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x + 1.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
+				}
+				
 			}
 		}
+		else
+		{
+			if(texture(tex, (p.xz + vec2(-1, 0)) / m_texSize).a > 0)		
+				closest = sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z + 0.5f), vec3(0.5f));
+			if(rd.z > 0)
+			{
+				if(texture(tex, (p.xz + vec2(0, 1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
+				}
+				else if(texture(tex, (p.xz + vec2(-1, 1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z + 1.5f), vec3(0.5f)));
+				}
+			}
+			else
+			{
+				if(texture(tex, (p.xz + vec2(0, -1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x + 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
+				}
+				if(texture(tex, (p.xz + vec2(-1, -1)) / m_texSize).a > 0)		
+				{
+					closest = min(closest, sdBox(p - vec3(flooredP.x - 0.5f, 0.0f, flooredP.z - 0.5f), vec3(0.5f)));
+				}
+			}
+		}
+		return closest;
 	}
 	return closest;
 	//return sdBox(p - vec3(floor(p.x) + 0.5f, 0.0f, floor(p.z) + 0.5f), vec3(0.45f));
@@ -159,7 +208,7 @@ void raymarch(vec3 ro, vec3 rd, out int i, out float t)
 	
 	for(i = 0; i < m_rmSteps; ++i)
 	{
-		float dist = distScene(ro + rd * t);
+		float dist = distScene(ro, rd, t);
 
 		// We make epsilon proportional to t so that we drop accuracy the further into the scene we get
 		// We also drop the ray as soon as it leaves the clipping volume as defined by m_zFar
@@ -180,7 +229,7 @@ float getVisibility(vec3 p0, vec3 p1, float k)
 	float f = 1.0f;
 	while(t < maxt)
 	{
-		float d = distScene(p0 + rd * t);
+		float d = distScene(p0, rd, t);
 
 		// A surface was hit before we reached p1
 		if(d < m_rmEpsilon)
@@ -197,14 +246,14 @@ float getVisibility(vec3 p0, vec3 p1, float k)
 
 // Approximates the (normalized) gradient of the distance function at the given point.
 // If p is near a surface, the function will approximate the surface normal.
-vec3 getNormal(vec3 p)
+vec3 getNormal(vec3 ro, vec3 rd, float t)
 {
 	float h = 0.0001f;
-
+	vec3 p = ro + rd * t;
 	return normalize(vec3(
-		distScene(p + vec3(h, 0, 0)) - distScene(p - vec3(h, 0, 0)),
-		distScene(p + vec3(0, h, 0)) - distScene(p - vec3(0, h, 0)),
-		distScene(p + vec3(0, 0, h)) - distScene(p - vec3(0, 0, h))));
+		distScene(ro + vec3(h, 0, 0), rd, t) - distScene(ro - vec3(h, 0, 0), rd, t),
+		distScene(ro + vec3(0, h, 0), rd, t) - distScene(ro - vec3(0, h, 0), rd, t),
+		distScene(ro + vec3(0, 0, h), rd, t) - distScene(ro - vec3(0, 0, h), rd, t)));
 }
 
 // Calculate the light intensity with soft shadows
@@ -222,20 +271,8 @@ vec4 getShading(vec3 p, vec3 normal, vec3 lightPos, vec4 lightColor)
 		intensity = clamp(dot(normal, lightDirection), 0, 1) * vis;
 	}
 
+
 	return lightColor * intensity + m_ambient * (1.0f - intensity);
-}
-
-vec4 getShadingWithTexture(vec3 p, vec3 normal, vec3 lightPos, vec4 lightColor)
-{
-	float intensity = 0.0f;
-	float vis = getVisibility(p, lightPos, 16);
-	if(vis > 0.0f)
-	{
-		vec3 lightDirection = normalize(lightPos - p);
-		intensity = clamp(dot(normal, lightDirection), 0, 1) * vis;
-	}
-
-	return lightColor * intensity + m_ambient * (1.0f - intensity) * texture(tex, p.xz / m_texSize);
 }
 
 // Compute an ambient occlusion factor
@@ -250,7 +287,7 @@ float ambientOcclusion(vec3 p, vec3 n)
 	float oc = 0.0f;
 	for(int i = 0; i < 10; ++i)
 	{
-		float d = distScene(p + n * t);
+		float d = distScene(p, n, t);
 		oc += t - d; // Actual distance to surface - distance field value
 		t += stepSize;
 	}
@@ -281,12 +318,12 @@ vec4 computeColor(vec3 ro, vec3 rd)
 
 	vec3 floorNormal = vec3(0, 1, 0);
 	float t1 = raytraceFloor(ro, rd, floorNormal, vec3(0, -0.5, 0));
-
+	
+	vec4 color = vec4(1);
 	vec3 p; // Surface point
 	vec3 normal; // Surface normal
 	float t; // Distance traveled by ray from eye
 	vec4 surfTexture = vec4(1.0); // Surface texture
-	bool hitCube = false;
 	if(t1 < t0 && t1 >= m_zNear && t1 <= m_zFar) // The floor was closest
 	{
 		t = t1;
@@ -298,15 +335,14 @@ vec4 computeColor(vec3 ro, vec3 rd)
 	{
 		t = t0;
 		p = ro + rd * t0;
-		normal = getNormal(p);
-		hitCube = true;
+		normal = getNormal(ro, rd, t0);
 	}
 	else
 	{
 		return m_skyColor;
 	}
 
-	vec4 color;
+	
 	float z = mapTo(t, m_zNear, m_zFar, 1, 0); // Map depth to [0, 1]
 
 	// Color based on depth
@@ -315,20 +351,10 @@ vec4 computeColor(vec3 ro, vec3 rd)
 	// Diffuse lighting
 
 
-	if(hitCube)
-	{
-		color = surfTexture * (
-			getShadingWithTexture(p, normal, m_light0Position, m_light0Color) +
-			getShadingWithTexture(p, normal, vec3(2.0f, 1.0f, 0.0f), vec4(1.0f, 0.5f, 0.5f, 1.0f))
-		) / 2.0f;
-	}
-	else
-	{
-		color = surfTexture * (
-			getShading(p, normal, m_light0Position, m_light0Color) +
-			getShading(p, normal, vec3(2.0f, 1.0f, 0.0f), vec4(1.0f, 0.5f, 0.5f, 1.0f))
-		) / 2.0f;
-	}
+	color *= surfTexture * (
+		getShading(p, normal, m_light0Position, m_light0Color) +
+		getShading(p, normal, vec3(2.0f, 1.0f, 0.0f), vec4(1.0f, 0.5f, 0.5f, 1.0f))
+	) / 2.0f;
 	// Color based on surface normal
 	//color = vec4(abs(normal), 1.0);
 
@@ -350,15 +376,15 @@ void main()
 	vec3 ro = m_eye;
 	vec3 rd = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * TexCoord.y);
 
-	//vec4 color = computeColor(ro, rd);
+	vec4 color = computeColor(ro, rd);
 
 	// 4xAA
-	vec3 rd0 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x - hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
-	vec3 rd1 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x + hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
-	vec3 rd2 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y - hps.y));
-	vec3 rd3 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y + hps.y));
-
-	vec4 color = (computeColor(ro, rd0) + computeColor(ro, rd1) + computeColor(ro, rd2) + computeColor(ro, rd3)) / 4.0;
+	//vec3 rd0 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x - hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
+	//vec3 rd1 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x + hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
+	//vec3 rd2 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y - hps.y));
+	//vec3 rd3 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y + hps.y));
+	//
+	//vec4 color = (computeColor(ro, rd0) + computeColor(ro, rd1) + computeColor(ro, rd2) + computeColor(ro, rd3)) / 4.0;
 
 	outColor = vec4(color.xyz, 1.0f);
 }

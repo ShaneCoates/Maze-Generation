@@ -10,44 +10,8 @@ MazeRenderer::MazeRenderer(GLFWwindow* _window)
 
 	m_window = _window;
 
-	//Create program
-	m_programID = ShaderLoader::LoadProgram("res/shaders/basicTexture.vs", "res/shaders/basicTexture.fs");
+	CreateProgram();
 
-	//Create Texture
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glGenTextures(1, &m_textureID);
-	glBindTexture(GL_TEXTURE_2D, m_textureID);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-
-	//Create buffer objects
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
-
-	m_positionAttributeLoc = glGetAttribLocation(m_programID, "position");
-	m_texcoordAttributeLoc = glGetAttribLocation(m_programID, "texcoord");
-	m_resolutionLoc = glGetUniformLocation(m_programID, "m_resolution");
-	m_camUpLoc = glGetUniformLocation(m_programID, "m_camUp");
-	m_camRightLoc = glGetUniformLocation(m_programID, "m_camRight");
-	m_camForwardLoc = glGetUniformLocation(m_programID, "m_camForward");
-	m_eyeLoc = glGetUniformLocation(m_programID, "m_eye");
-	m_focalLengthLoc = glGetUniformLocation(m_programID, "m_focalLength");
-	m_zNearLoc = glGetUniformLocation(m_programID, "m_zNear");
-	m_zFarLoc = glGetUniformLocation(m_programID, "m_zFar");
-	m_aspectRatioLoc = glGetUniformLocation(m_programID, "m_aspectRatio");
-	m_rmStepsLoc = glGetUniformLocation(m_programID, "m_rmSteps");
-	m_rmEpsilonLoc = glGetUniformLocation(m_programID, "m_rmEpsilon");
-	m_skyColorLoc = glGetUniformLocation(m_programID, "m_skyColor");
-	m_ambientLoc = glGetUniformLocation(m_programID, "m_ambient");
-	m_light0PosLoc = glGetUniformLocation(m_programID, "m_light0Position");
-	m_light0ColorLoc = glGetUniformLocation(m_programID, "m_light0Color");
-	m_texSizeLoc = glGetUniformLocation(m_programID, "m_texSize");
-	
 }
 
 MazeRenderer::~MazeRenderer()
@@ -57,19 +21,10 @@ MazeRenderer::~MazeRenderer()
 
 void MazeRenderer::Update(double _dt)
 {
-	if (glfwGetKey(m_window, GLFW_KEY_G))
-	{
-		if(!toggleGUIButtonDown)
-			showGUI = !showGUI;
-
-		toggleGUIButtonDown = true;
-	}
-	else
-	{
-		toggleGUIButtonDown = false;
-	}
 
 
+	if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
+		CreateProgram();
 
 	if (glfwGetKey(m_window, GLFW_KEY_A))
 		m_eye -= m_camRight * m_moveSpeed;
@@ -126,8 +81,7 @@ void MazeRenderer::Update(double _dt)
 
 void MazeRenderer::Draw()
 {
-	if (showGUI)
-	{
+	
 		ImGui::SliderInt("Raymarch steps", &m_rmSteps, 0, 1000);
 		ImGui::SliderFloat("Far Clipping plane", &m_zFar, 0, 1000);
 
@@ -137,7 +91,7 @@ void MazeRenderer::Draw()
 		ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light0Position), -100.0f, 100.0f);
 		ImGui::ColorEdit4("Light Color", glm::value_ptr(m_light0Color));
 
-	}
+	
 	glUseProgram(m_programID);
 
 	glBindVertexArray(m_vao);
@@ -172,6 +126,49 @@ void MazeRenderer::Draw()
 
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void MazeRenderer::CreateProgram()
+{	
+	//Create program
+	m_programID = ShaderLoader::LoadProgram("res/shaders/basicTexture.vs", "res/shaders/basicTexture.fs");
+
+	//Create Texture
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glGenTextures(1, &m_textureID);
+	glBindTexture(GL_TEXTURE_2D, m_textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+
+	//Create buffer objects
+	glGenVertexArrays(1, &m_vao);
+	glGenBuffers(1, &m_vbo);
+
+	m_positionAttributeLoc = glGetAttribLocation(m_programID, "position");
+	m_texcoordAttributeLoc = glGetAttribLocation(m_programID, "texcoord");
+	m_resolutionLoc = glGetUniformLocation(m_programID, "m_resolution");
+	m_camUpLoc = glGetUniformLocation(m_programID, "m_camUp");
+	m_camRightLoc = glGetUniformLocation(m_programID, "m_camRight");
+	m_camForwardLoc = glGetUniformLocation(m_programID, "m_camForward");
+	m_eyeLoc = glGetUniformLocation(m_programID, "m_eye");
+	m_focalLengthLoc = glGetUniformLocation(m_programID, "m_focalLength");
+	m_zNearLoc = glGetUniformLocation(m_programID, "m_zNear");
+	m_zFarLoc = glGetUniformLocation(m_programID, "m_zFar");
+	m_aspectRatioLoc = glGetUniformLocation(m_programID, "m_aspectRatio");
+	m_rmStepsLoc = glGetUniformLocation(m_programID, "m_rmSteps");
+	m_rmEpsilonLoc = glGetUniformLocation(m_programID, "m_rmEpsilon");
+	m_skyColorLoc = glGetUniformLocation(m_programID, "m_skyColor");
+	m_ambientLoc = glGetUniformLocation(m_programID, "m_ambient");
+	m_light0PosLoc = glGetUniformLocation(m_programID, "m_light0Position");
+	m_light0ColorLoc = glGetUniformLocation(m_programID, "m_light0Color");
+	m_texSizeLoc = glGetUniformLocation(m_programID, "m_texSize");
+
+
 }
 
 void MazeRenderer::UpdateTexture(Maze* _maze)

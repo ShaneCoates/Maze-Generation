@@ -62,13 +62,16 @@ void Game::Run() {
 	while (glfwWindowShouldClose(m_gameWindow) == false) {
 		double dt = GetDeltaTime();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//ImGui::Text("%.2f ms - %.1f FPS", dt * 1000, ImGui::GetIO().Framerate);
-		//ImGui::Separator();
+		ImGui_ImplGlfwGL3_NewFrame();
+
+		ImGui::Text("%.2f ms - %.1f FPS", dt * 1000, 1 / dt);
+		ImGui::Separator();
 
 		m_gameStateManager->Update(dt);
 		m_gameStateManager->Draw();
 		
-		
+		ImGui::Render();
+
 		glfwSwapBuffers(m_gameWindow);
 		glfwPollEvents();
 	}

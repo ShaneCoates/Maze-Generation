@@ -50,7 +50,6 @@ private:
 	double m_timer;
 
 	bool toggleGUIButtonDown = false;
-	bool showGUI = true;
 };
 
 #endif
