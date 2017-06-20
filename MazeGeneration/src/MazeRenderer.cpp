@@ -22,7 +22,6 @@ MazeRenderer::~MazeRenderer()
 void MazeRenderer::Update(double _dt)
 {
 
-
 	if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
 		CreateProgram();
 
@@ -82,14 +81,17 @@ void MazeRenderer::Update(double _dt)
 void MazeRenderer::Draw()
 {
 	
-		ImGui::SliderInt("Raymarch steps", &m_rmSteps, 0, 1000);
-		ImGui::SliderFloat("Far Clipping plane", &m_zFar, 0, 1000);
+	ImGui::SliderInt("Raymarch steps", &m_rmSteps, 0, 1000);
+	ImGui::SliderFloat("Far Clipping plane", &m_zFar, 0, 1000);
 
-		ImGui::ColorEdit4("Sky Color", glm::value_ptr(m_skyColor));
+	ImGui::ColorEdit4("Sky Color", glm::value_ptr(m_skyColor));
 
-		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(m_ambient));
-		ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light0Position), -100.0f, 100.0f);
-		ImGui::ColorEdit4("Light Color", glm::value_ptr(m_light0Color));
+	ImGui::ColorEdit4("Ambient Color", glm::value_ptr(m_ambient));
+	ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light0Position), -100.0f, 100.0f);
+	ImGui::ColorEdit4("Light Color", glm::value_ptr(m_light0Color));
+	ImGui::SliderFloat3("Agent Light Offset", glm::value_ptr(m_light1Position), -10.0f, 10.0f);
+	ImGui::ColorEdit4("Agent Light Color", glm::value_ptr(m_light1Color));
+
 
 	
 	glUseProgram(m_programID);
@@ -121,9 +123,11 @@ void MazeRenderer::Draw()
 	glUniform4fv(m_ambientLoc, 1, value_ptr(m_ambient));
 	glUniform3fv(m_light0PosLoc, 1, value_ptr(m_light0Position));
 	glUniform4fv(m_light0ColorLoc, 1, value_ptr(m_light0Color));
+	glUniform3fv(m_light1PosLoc, 1, value_ptr(m_navAgentPos + m_light1Position));
+	glUniform4fv(m_light1ColorLoc, 1, value_ptr(m_light1Color));
+
 	glUniform1i(m_texSizeLoc, MAZE_WIDTH);
-
-
+	glUniform3fv(m_navAgentPosLoc, 1, value_ptr(m_navAgentPos));
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -166,13 +170,17 @@ void MazeRenderer::CreateProgram()
 	m_ambientLoc = glGetUniformLocation(m_programID, "m_ambient");
 	m_light0PosLoc = glGetUniformLocation(m_programID, "m_light0Position");
 	m_light0ColorLoc = glGetUniformLocation(m_programID, "m_light0Color");
+	m_light1PosLoc = glGetUniformLocation(m_programID, "m_light1Position");
+	m_light1ColorLoc = glGetUniformLocation(m_programID, "m_light1Color");
 	m_texSizeLoc = glGetUniformLocation(m_programID, "m_texSize");
-
+	m_navAgentPosLoc = glGetUniformLocation(m_programID, "m_navAgentPos");
 
 }
 
 void MazeRenderer::UpdateTexture(Maze* _maze)
 {
+	m_currentMaze = _maze;
+	m_navAgentPos = m_currentMaze->GetNavAgentPosition();
 	GLubyte m_pixelData[MAZE_WIDTH][MAZE_HEIGHT];// [4];
 	glm::vec4 currentColor = glm::vec4(0.0f);
 	for (int x = 0; x < MAZE_WIDTH; x++)

@@ -10,6 +10,7 @@
 #include "RandomPrims.h"
 #include "Wilsons.h"
 #include "AStar.h"
+#include "glm\gtx\compatibility.hpp"
 
 Maze::Maze() {
 	for (unsigned int x = 0; x < MAZE_WIDTH; x++) {
@@ -32,6 +33,7 @@ Maze::Maze() {
 	m_wilsons = new Wilsons(m_mazePieces);
 	
 	m_position = glm::vec3(0);
+	m_navAgentPos = m_mazePieces[1][0]->Position;
 	ResetMaze();
 
 }
@@ -39,6 +41,25 @@ Maze::~Maze() {
 
 }
 void Maze::Update(double _dt) {
+	if (m_isNavigating)
+	{
+		m_navAgentPos = glm::lerp(m_aStarPath[m_currentNode], m_aStarPath[m_currentNode + 1], m_timeBetweenNodes);
+
+		m_timeBetweenNodes += _dt * 3;
+		if (m_timeBetweenNodes > 1.0f)
+		{
+			m_timeBetweenNodes -= 1.0f;
+			if (m_aStarPath.size() - 2 > m_currentNode)
+			{
+				m_currentNode++;
+			}
+			else
+			{
+				m_isNavigating = false;
+				m_navAgentPos = m_aStarPath[m_currentNode + 1];
+			}
+		}
+	}
 	if (m_flooding) {
 		for (int i = 0; i < ITERATIONS; i++)
 		{
@@ -155,6 +176,7 @@ MazePiece* Maze::West(glm::vec2 _pos) {
 void Maze::Stop() {
 	m_randomTraversal->Stop();
 	m_randomDepthFirst->Stop();
+	m_randomPrims->Stop();
 }
 
 void Maze::ResetMaze() {
@@ -174,6 +196,12 @@ void Maze::ResetMaze() {
 	m_floodingCount = 0;
 	m_floodingOpen.clear();
 	m_flooding = false;
+
+	m_isNavigating = false;
+	m_timeBetweenNodes = 0.0f;
+	m_currentNode = 0;
+	m_navAgentPos = m_navAgentPos = m_mazePieces[1][0]->Position;
+
 }
 
 void Maze::Flood() {
@@ -258,7 +286,14 @@ void Maze::DemonstrateWilsons() {
 }
 void Maze::InstantAStar()
 {
-	AStar::Instant(m_mazePieces, m_mazePieces[0][1], m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1], m_floodingOpen);
+	m_aStarPath = AStar::Instant(m_mazePieces, m_mazePieces[0][1], m_mazePieces[MAZE_WIDTH - 2][MAZE_HEIGHT - 1], m_floodingOpen);
+	if (m_aStarPath.size() > 1)
+	{
+		m_isNavigating = true;
+		m_timeBetweenNodes = 0.0f;
+		m_currentNode = 0;
+		m_navAgentPos = m_navAgentPos = m_mazePieces[1][0]->Position;
+	}
 }
 glm::vec4 Maze::GetPieceColor(unsigned int _x, unsigned int _y)
 {
@@ -273,4 +308,11 @@ glm::vec4 Maze::GetPieceColor(unsigned int _x, unsigned int _y)
 //	if(mp->AStarPath)
 		//pColour = glm::vec4(0, 1, 0, 1);
 	return pColour;
+}
+
+glm::vec3 Maze::GetNavAgentPosition()
+{
+	
+	return m_navAgentPos + glm::vec3(0.5f, 0.0f, 0.5f);
+	
 }

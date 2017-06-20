@@ -61,6 +61,8 @@ public:
 
 	glm::vec4 GetPieceColor(unsigned int _x, unsigned int _y);
 
+	glm::vec3 GetNavAgentPosition();
+
 	glm::vec3 m_position;
 
 protected:
@@ -70,6 +72,7 @@ private:
 
 	bool m_flooding;
 	std::map<MazePiece*, float> m_floodingOpen;
+	
 	float m_floodingCount;
 	MazePiece* GetRandomNeighbor(MazePiece* _start);
 
@@ -85,6 +88,14 @@ private:
 	RandomDepthFirst* m_randomDepthFirst;
 	RandomPrims* m_randomPrims;
 	Wilsons* m_wilsons;
+
+
+	std::vector<glm::vec3> m_aStarPath;
+	bool m_isNavigating = false;
+	float m_timeBetweenNodes = 0.0f;
+	int m_currentNode = 0;
+	glm::vec3 m_navAgentPos;
+
 };
 
 #endif

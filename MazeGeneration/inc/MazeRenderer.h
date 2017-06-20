@@ -23,7 +23,7 @@ private:
 	void CreateProgram();
 
 	GLFWwindow* m_window;
-
+	Maze* m_currentMaze = nullptr;
 	unsigned int m_programID;
 	unsigned int m_textureID;
 
@@ -59,6 +59,11 @@ private:
 	glm::vec4 m_ambient = glm::vec4(0.15, 0.2f, 0.32f, 1.0f);
 	glm::vec3 m_light0Position = glm::vec3(0.25f, 20.0f, 0.0f);
 	glm::vec4 m_light0Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
+	glm::vec3 m_light1Position = glm::vec3(0.0f, 0.5f, 0.0f);
+	glm::vec4 m_light1Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
+
+
+	glm::vec3 m_navAgentPos = glm::vec3(0, 0, 0);
 
 	const int m_windowWidth = 1280;
 	const int m_windowHeight = 720;
@@ -79,8 +84,11 @@ private:
 	GLuint m_ambientLoc;
 	GLuint m_light0PosLoc;
 	GLuint m_light0ColorLoc;
-	GLuint m_texSizeLoc;
+	GLuint m_light1PosLoc;
+	GLuint m_light1ColorLoc;
 
+	GLuint m_texSizeLoc;
+	GLuint m_navAgentPosLoc;
 	bool toggleGUIButtonDown = false;
 };
 

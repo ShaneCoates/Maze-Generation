@@ -1,12 +1,13 @@
 #include "AStar.h"
-void AStar::Instant(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT], MazePiece* _start, MazePiece* _end, std::map<MazePiece*, float>& _floodingOpen)
+std::vector<glm::vec3> AStar::Instant(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT], MazePiece* _start, MazePiece* _end, std::map<MazePiece*, float>& _floodingOpen)
 {
+	std::vector<glm::vec3> path = std::vector<glm::vec3>();
 	std::list<MazePiece*> _openList;
 	MazePiece* _currentNode = _start;
 	_openList.push_back(_start);
 
 	if (_currentNode == nullptr || _end == nullptr)
-		return;
+		return path;
 
 
 	float _dx2 = _currentNode->Position.x - _end->Position.x;
@@ -22,7 +23,7 @@ void AStar::Instant(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT], MazePiece* 
 	}
 
 	if (_currentNode == nullptr)
-		return;
+		return path;
 
 	while (_currentNode != _end && _openList.size() > 0)
 	{
@@ -113,13 +114,16 @@ void AStar::Instant(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT], MazePiece* 
 		_floodingOpen.insert(std::pair<MazePiece*, float>(_currentNode, (_currentNode->Parent->cost + _currentNode->cost) * 0.01f));
 		//outPath.push_back(_currentNode);
 		_currentNode->AStarPath = true;
+		path.push_back(glm::vec3(_currentNode->Position.z, -0.25f, _currentNode->Position.x));
 		while (_currentNode->Parent != _start)
 		{
 			_currentNode->AStarPath = true;
 
 			_floodingOpen.insert(std::pair<MazePiece*, float>(_currentNode, _currentNode->cost * 0.01f));
 			_currentNode = _currentNode->Parent;
+			path.push_back(glm::vec3(_currentNode->Position.z, -0.25f, _currentNode->Position.x));
 		}
+
 		_currentNode->AStarPath = true;
 		_currentNode->Parent->AStarPath = true;
 		_floodingOpen.insert(std::pair<MazePiece*, float>(_currentNode, _currentNode->cost * 0.01f));
@@ -135,6 +139,6 @@ void AStar::Instant(MazePiece* _mazePieces[MAZE_WIDTH][MAZE_HEIGHT], MazePiece* 
 			_mazePieces[x][z]->Parent = nullptr;
 		}
 	}
-
-	return;
+	std::reverse(path.begin(), path.end());
+	return path;
 }

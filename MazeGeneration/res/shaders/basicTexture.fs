@@ -27,6 +27,11 @@ uniform vec4 m_skyColor;
 uniform vec4 m_ambient;
 uniform vec3 m_light0Position;
 uniform vec4 m_light0Color;
+uniform vec3 m_light1Position;
+uniform vec4 m_light1Color;
+
+
+uniform vec3 m_navAgentPos;
 
 uniform int m_texSize;
 
@@ -138,7 +143,7 @@ float distScene(vec3 ro, vec3 rd, float t)
 	vec3 flooredP = vec3(floor(p.x), p.y, floor(p.z));
 	if(sdFromTex(p, vec2(0), closest))
 	{
-		return closest;
+		return min(closest, sdSphere(p - m_navAgentPos, 0.25f));	
 	}
 	else
 	{
@@ -172,9 +177,9 @@ float distScene(vec3 ro, vec3 rd, float t)
 					sdFromTex(p, vec2(-1, -1), closest);
 			}
 		}
-		return closest;
+		return min(closest, sdSphere(p - m_navAgentPos, 0.25f));
 	}
-	return closest;
+	return min(closest, sdSphere(p - m_navAgentPos, 0.25f));
 	//return sdBox(p - vec3(floor(p.x) + 0.5f, 0.0f, floor(p.z) + 0.5f), vec3(0.45f));
 
 
@@ -348,7 +353,7 @@ vec4 computeColor(vec3 ro, vec3 rd)
 
 	color *= surfTexture * (
 		getShading(p, normal, m_light0Position, m_light0Color) +
-		getShading(p, normal, vec3(2.0f, 1.0f, 0.0f), vec4(1.0f, 0.5f, 0.5f, 1.0f))
+		getShading(p, normal, m_light1Position, m_light1Color)
 	) / 2.0f;
 	// Color based on surface normal
 	//color = vec4(abs(normal), 1.0);
