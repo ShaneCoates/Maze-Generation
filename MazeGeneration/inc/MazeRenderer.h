@@ -55,10 +55,10 @@ private:
 	int m_rmSteps = 64;
 	float m_rmEpsilon = 0.001f;
 
-	glm::vec4 m_skyColor = glm::vec4(0.31f, 0.47f, 0.67f, 1.0f);
-	glm::vec4 m_ambient = glm::vec4(0.15, 0.2f, 0.32f, 1.0f);
-	glm::vec3 m_light0Position = glm::vec3(0.25f, 20.0f, 0.0f);
-	glm::vec4 m_light0Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
+	glm::vec4 m_skyColor = glm::vec4(80.0f / 255.0f, 120.0f / 255.0f, 165.0f / 255.0f, 1.0f);
+	glm::vec4 m_ambient = glm::vec4(40.0f / 255.0f, 16.0f / 255.0f, 32.0f / 255.0f, 1.0f);
+	glm::vec3 m_light0Position = glm::vec3(10, 5, 8);
+	glm::vec4 m_light0Color = glm::vec4(171.0f / 255.0f, 222.0f / 255.0f, 237.0f / 255.0f, 1.0f);
 	glm::vec3 m_light1Position = glm::vec3(0.0f, 0.5f, 0.0f);
 	glm::vec4 m_light1Color = glm::vec4(0.67f, 0.87f, 0.93f, 1.0f);
 

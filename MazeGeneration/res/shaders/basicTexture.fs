@@ -376,15 +376,15 @@ void main()
 	vec3 ro = m_eye;
 	vec3 rd = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * TexCoord.y);
 
-	vec4 color = computeColor(ro, rd);
+	//vec4 color = computeColor(ro, rd);
 
 	// 4xAA
-	//vec3 rd0 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x - hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
-	//vec3 rd1 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x + hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
-	//vec3 rd2 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y - hps.y));
-	//vec3 rd3 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y + hps.y));
-	//
-	//vec4 color = (computeColor(ro, rd0) + computeColor(ro, rd1) + computeColor(ro, rd2) + computeColor(ro, rd3)) / 4.0;
+	vec3 rd0 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x - hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
+	vec3 rd1 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x + hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
+	vec3 rd2 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y - hps.y));
+	vec3 rd3 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y + hps.y));
+	
+	vec4 color = (computeColor(ro, rd0) + computeColor(ro, rd1) + computeColor(ro, rd2) + computeColor(ro, rd3)) / 4.0;
 
 	outColor = vec4(color.xyz, 1.0f);
 }

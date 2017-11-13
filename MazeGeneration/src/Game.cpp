@@ -28,8 +28,8 @@ Game::Game() {
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-	//m_gameWindow = glfwCreateWindow(mode->width, mode->height, "Maze Generation - Shane Coates", glfwGetPrimaryMonitor(), nullptr);
-	m_gameWindow = glfwCreateWindow(1280, 720, "Maze Generation - Shane Coates", nullptr, nullptr);
+	m_gameWindow = glfwCreateWindow(mode->width, mode->height, "Maze Generation - Shane Coates", glfwGetPrimaryMonitor(), nullptr);
+	//m_gameWindow = glfwCreateWindow(1280, 720, "Maze Generation - Shane Coates", nullptr, nullptr);
 	if (m_gameWindow == nullptr) {
 		printf("Failed to create Game Window");
 		glfwTerminate();
@@ -64,8 +64,8 @@ void Game::Run() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ImGui_ImplGlfwGL3_NewFrame();
 
-		ImGui::Text("%.2f ms - %.1f FPS", dt * 1000, 1 / dt);
-		ImGui::Separator();
+		//ImGui::Text("%.2f ms - %.1f FPS", dt * 1000, 1 / dt);
+		//ImGui::Separator();
 
 		m_gameStateManager->Update(dt);
 		m_gameStateManager->Draw();
