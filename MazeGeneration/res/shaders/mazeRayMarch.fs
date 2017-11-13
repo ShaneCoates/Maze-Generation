@@ -30,6 +30,9 @@ uniform vec4 m_light0Color;
 uniform vec3 m_light1Position;
 uniform vec4 m_light1Color;
 
+//Debug options
+uniform int m_MSAA;
+uniform int m_AO;
 
 uniform vec3 m_navAgentPos;
 
@@ -349,8 +352,6 @@ vec4 computeColor(vec3 ro, vec3 rd)
 	//color = vec4(1.0f) * z;
 
 	// Diffuse lighting
-
-
 	color *= surfTexture * (
 		getShading(p, normal, m_light0Position, m_light0Color) +
 		getShading(p, normal, m_light1Position, m_light1Color)
@@ -358,16 +359,19 @@ vec4 computeColor(vec3 ro, vec3 rd)
 	// Color based on surface normal
 	//color = vec4(abs(normal), 1.0);
 
-	// Blend in ambient occlusion factor
-	float ao = ambientOcclusion(p, normal);
-	color = color * (1.0f - ao);
+	if(m_AO > 0)
+	{
+		// Blend in ambient occlusion factor
+		float ao = ambientOcclusion(p, normal);
+		color = color * (1.0f - ao);
+	}
 
 	// Blend the background color based on the distance from the camera
 	float zSqrd = z * z;
 	color = mix(m_skyColor, color, zSqrd * (3.0f - 2.0f * z)); // Fog
 
 	return color;
-;
+
 }
 
 void main()
@@ -376,16 +380,21 @@ void main()
 	vec3 ro = m_eye;
 	vec3 rd = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * TexCoord.y);
 
-	//vec4 color = computeColor(ro, rd);
-
+	vec4 color;
+	if(m_MSAA == 0)
+	{
+		 color = computeColor(ro, rd);
+	}
+	else
+	{
 	// 4xAA
-	vec3 rd0 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x - hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
-	vec3 rd1 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x + hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
-	vec3 rd2 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y - hps.y));
-	vec3 rd3 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y + hps.y));
+		vec3 rd0 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x - hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
+		vec3 rd1 = normalize(m_camForward * m_focalLength + m_camRight * (TexCoord.x + hps.x) * m_aspectRatio + m_camUp * TexCoord.y);
+		vec3 rd2 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y - hps.y));
+		vec3 rd3 = normalize(m_camForward * m_focalLength + m_camRight * TexCoord.x * m_aspectRatio + m_camUp * (TexCoord.y + hps.y));
 	
-	vec4 color = (computeColor(ro, rd0) + computeColor(ro, rd1) + computeColor(ro, rd2) + computeColor(ro, rd3)) / 4.0;
-
+		color = (computeColor(ro, rd0) + computeColor(ro, rd1) + computeColor(ro, rd2) + computeColor(ro, rd3)) / 4.0;
+	}
 	outColor = vec4(color.xyz, 1.0f);
 }
 

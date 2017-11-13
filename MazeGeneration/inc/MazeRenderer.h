@@ -87,9 +87,15 @@ private:
 	GLuint m_light1PosLoc;
 	GLuint m_light1ColorLoc;
 
+	GLuint m_useMSAALoc;
+	GLuint m_useAOLoc;
+
 	GLuint m_texSizeLoc;
 	GLuint m_navAgentPosLoc;
 	bool toggleGUIButtonDown = false;
+
+	bool m_useMSAA = false;
+	bool m_useAO;
 };
 
 #endif

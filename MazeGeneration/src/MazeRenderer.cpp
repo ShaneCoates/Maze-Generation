@@ -80,7 +80,12 @@ void MazeRenderer::Update(double _dt)
 
 void MazeRenderer::Draw()
 {
-	
+	if (ImGui::CollapsingHeader("Graphics")) {
+		ImGui::Checkbox("Use MSAA", &m_useMSAA);
+		ImGui::Checkbox("Use AO", &m_useAO);
+	}
+
+
 	ImGui::SliderInt("Raymarch steps", &m_rmSteps, 0, 1000);
 	ImGui::SliderFloat("Far Clipping plane", &m_zFar, 0, 1000);
 
@@ -92,8 +97,6 @@ void MazeRenderer::Draw()
 	ImGui::SliderFloat3("Agent Light Offset", glm::value_ptr(m_light1Position), -10.0f, 10.0f);
 	ImGui::ColorEdit4("Agent Light Color", glm::value_ptr(m_light1Color));
 
-
-	
 	glUseProgram(m_programID);
 
 	glBindVertexArray(m_vao);
@@ -106,8 +109,6 @@ void MazeRenderer::Draw()
 	glEnableVertexAttribArray(m_texcoordAttributeLoc);
 	glVertexAttribPointer(m_texcoordAttributeLoc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-
-	
 	glUniform2f(m_resolutionLoc, m_windowWidth, m_windowHeight);
 	glUniform1f(m_zNearLoc, m_zNear);
 	glUniform1f(m_zFarLoc, m_zFar);
@@ -126,6 +127,10 @@ void MazeRenderer::Draw()
 	glUniform3fv(m_light1PosLoc, 1, value_ptr(m_navAgentPos + m_light1Position));
 	glUniform4fv(m_light1ColorLoc, 1, value_ptr(m_light1Color));
 
+	glUniform1i(m_useMSAALoc, m_useMSAA ? 1 : 0);
+	glUniform1i(m_useAOLoc, m_useAO ? 1 : 0);
+
+
 	glUniform1i(m_texSizeLoc, MAZE_WIDTH);
 	glUniform3fv(m_navAgentPosLoc, 1, value_ptr(m_navAgentPos));
 
@@ -135,7 +140,7 @@ void MazeRenderer::Draw()
 void MazeRenderer::CreateProgram()
 {	
 	//Create program
-	m_programID = ShaderLoader::LoadProgram("res/shaders/basicTexture.vs", "res/shaders/basicTexture.fs");
+	m_programID = ShaderLoader::LoadProgram("res/shaders/mazeRayMarch.vs", "res/shaders/mazeRayMarch.fs");
 
 	//Create Texture
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -174,6 +179,8 @@ void MazeRenderer::CreateProgram()
 	m_light1ColorLoc = glGetUniformLocation(m_programID, "m_light1Color");
 	m_texSizeLoc = glGetUniformLocation(m_programID, "m_texSize");
 	m_navAgentPosLoc = glGetUniformLocation(m_programID, "m_navAgentPos");
+	m_useMSAALoc = glGetUniformLocation(m_programID, "m_MSAA");
+	m_useAOLoc = glGetUniformLocation(m_programID, "m_AO");
 
 }
 
