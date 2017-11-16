@@ -93,7 +93,7 @@ float opSubtract(float d0, float d1)
 // the ray accordingly and reverse the transformation for the
 // returning normal(without translation)
 //
-vec2 boxIntersection( vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal ) 
+vec2 boxIntersection( vec3 ro, vec3 rd, vec3 boxSize ) 
 {
     vec3 m = 1.0/rd;
     vec3 n = m*ro;
@@ -107,8 +107,6 @@ vec2 boxIntersection( vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal )
 	
     if( tN > tF || tF < 0.0) return vec2(-1.0); // no intersection
     
-    outNormal = -sign(rd)*step(t1.yzx,t1.xyz)*step(t1.zxy,t1.xyz);
-
     return vec2( tN, tF );
 }
 
@@ -140,79 +138,76 @@ bool sdFromTex(vec3 p, vec2 o, inout float dist)
 // Defines the distance field for the scene
 float distScene(vec3 ro, vec3 rd, float t)
 {
-	//p.xz = mod(p.xz, 1.0f);
+	float dist = 100;
 	vec3 p = ro + rd * t;
-	float closest = 100;
-	vec3 flooredP = vec3(floor(p.x), p.y, floor(p.z));
-	if(sdFromTex(p, vec2(0), closest))
+	if(sdFromTex(p, vec2(0), dist))
 	{
-		return min(closest, sdSphere(p - m_navAgentPos, 0.25f));	
+		return dist;	
 	}
 	else
 	{
-		closest = 100;
-		if(rd.x > 0)
-		{
-			sdFromTex(p, vec2(1, 0), closest);
-			if(rd.z > 0)
-			{
-				if(!sdFromTex(p, vec2(0, 1), closest))
-					sdFromTex(p, vec2(1, 1), closest);
-			}
-			else
-			{
-				if(!sdFromTex(p, vec2(0, -1), closest))
-					sdFromTex(p, vec2(1, -1), closest);			
-			}
-		}
-		else
-		{
-			sdFromTex(p, vec2(-1, 0), closest);
-			
-			if(rd.z > 0)
-			{
-				if(!sdFromTex(p, vec2(0, 1), closest))
-					sdFromTex(p, vec2(-1, 1), closest);
-			}
-			else
-			{
-				if(!sdFromTex(p, vec2(0, -1), closest))
-					sdFromTex(p, vec2(-1, -1), closest);
-			}
-		}
-		return min(closest, sdSphere(p - m_navAgentPos, 0.25f));
+		dist = min(dist, sdBox(p - vec3(floor(p.x) + (rd.x > 0 ? 1 : -1) + 0.5f, 0.0f, floor(p.z) + 0.5f), vec3(0.5f)));
+		dist = min(dist, sdBox(p - vec3(floor(p.x) + 0.5f, 0.0f, floor(p.z) + (rd.z > 0 ? 1 : -1) + 0.5f), vec3(0.5f)));
+		
+		return dist;
 	}
-	return min(closest, sdSphere(p - m_navAgentPos, 0.25f));
-	//return sdBox(p - vec3(floor(p.x) + 0.5f, 0.0f, floor(p.z) + 0.5f), vec3(0.45f));
-
-
-	//return sdSphere(p - vec3(0.0f, -0.25f, 0.0f), 0.25f);
-
-	// p = rotateY(p, 0.5f * p.y);
-	// float d1 = sdBox(p - vec3(0, 0.5, 0), vec3(0.5, 1.0, 0.5));
-	// float d2 = sdBox(p, vec3(2.0, 0.3, 0.25));
-	// return opSubtract(d1, d2);
 }
 
 
+// Defines the distance field for the scene
+bool findWall(vec3 ro, vec3 rd, inout float t)
+{
+	float dist = 100;
+	vec3 p = ro + rd * t;
+	if(sdFromTex(p, vec2(0), dist))
+	{
+		t += dist;
+		//t = min(t, sdSphere(ro + (rd * t) - m_navAgentPos, 0.25f));	
+		return true;	
+	}
+	else
+	{
+		dist = min(dist, sdBox(p - vec3(floor(p.x) + (rd.x > 0 ? 1 : -1) + 0.5f, 0.0f, floor(p.z) + 0.5f), vec3(0.5f)));
+		dist = min(dist, sdBox(p - vec3(floor(p.x) + 0.5f, 0.0f, floor(p.z) + (rd.z > 0 ? 1 : -1) + 0.5f), vec3(0.5f)));
+
+		t = dist + m_rmEpsilon;
+		return false;
+	}
+}
 
 // Finds the closest intersecting object along the ray at origin ro, and direction rd.
 // i: step count
 // t: distance traveled by the ray
 void raymarch(vec3 ro, vec3 rd, out int i, out float t)
 {
-	t = rayPlaneIntersect(ro, rd, vec3(0, 1, 0), vec3(0, 1, 0));
 	
+	vec3 offset = vec3(m_texSize / 2, -0.5, m_texSize / 2);
+	vec3 size = vec3(m_texSize / 2, 1, m_texSize / 2);
+	vec2 intersect = boxIntersection(ro - offset, rd, size);
+	t = intersect.x;
+	float maxT = intersect.y;
+	if(t < 0)
+	{
+		t = 10000;
+		return;
+	}
+
 	for(i = 0; i < m_rmSteps; ++i)
 	{
-		float dist = distScene(ro, rd, t);
-
-		// We make epsilon proportional to t so that we drop accuracy the further into the scene we get
-		// We also drop the ray as soon as it leaves the clipping volume as defined by m_zFar
-		if(dist < m_rmEpsilon * t * 2.0f || t > m_zFar)
+		float dist = t;
+		if(findWall(ro, rd, t))
+		{
 			break;
-		t += dist;
+		}
+		else
+		{
+			t += dist;
+
+			if(dist > maxT)
+				break;
+		}
 	}
+
 }
 
 // Returns a value between [0, 1] depending on how visible p0 is from p1
